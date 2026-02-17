@@ -1,0 +1,2899 @@
+<!DOCTYPE html>
+<html lang="bn">
+<script src="https://reportallege.com/e2/e8/ca/e2e8cac4f7cb5734c019b6b8cb0da2e7.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Community - FF & BS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff4655;
+            --secondary: #0f1923;
+            --accent: #00d4ff;
+            --success: #00ff88;
+            --warning: #ffa500;
+            --danger: #ff4444;
+            --dark: #0a0e13;
+            --card: #1a2332;
+            --text: #ffffff;
+            --text-muted: #8b9cb5;
+            --leader: #ffd700;
+            --mod: #9b59b6;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body.ff-theme { --primary: #ff6b35; }
+        body.bs-theme { --primary: #00b4d8; }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--dark);
+        }
+
+        /* ========== AUTH STYLES ========== */
+        .auth-screen {
+            min-height: 100vh;
+            padding: 15px;
+            display: none;
+            background: linear-gradient(180deg, var(--dark) 0%, #0d1520 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-screen.active { display: block; }
+
+        /* Animated Background */
+        .auth-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: floatAround 20s infinite ease-in-out;
+        }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -30px) rotate(90deg); }
+            50% { transform: translate(-30px, 50px) rotate(180deg); }
+            75% { transform: translate(-50px, -20px) rotate(270deg); }
+        }
+
+        .auth-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .auth-hero {
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        .auth-logo-box {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .auth-logo {
+            font-size: 4rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .auth-logo-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ff4655, #00d4ff, #00ff88);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 3s ease infinite;
+            margin-bottom: 8px;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .auth-tagline {
+            background: linear-gradient(135deg, rgba(255,70,85,0.2), rgba(0,212,255,0.2));
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Live Counter */
+        .live-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,255,136,0.05));
+            border-radius: 30px;
+            border: 1px solid rgba(0,255,136,0.3);
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: live-pulse 1.5s infinite;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .live-text {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .live-text span {
+            color: var(--success);
+            font-size: 1.3rem;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .stat-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+        .stat-card .value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .stat-card .label { font-size: 0.7rem; color: var(--text-muted); margin-top: 3px; }
+
+        /* Features */
+        .features-box {
+            margin: 25px 0;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            padding: 18px 12px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .feature-card .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin: 0 auto 10px;
+        }
+
+        .feature-card h4 { font-size: 0.9rem; margin-bottom: 3px; }
+        .feature-card p { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Testimonial */
+        .testimonial-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 3px solid var(--primary);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .testimonial-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-info h5 { font-size: 0.9rem; }
+        .testimonial-info span { font-size: 0.7rem; color: var(--text-muted); }
+        .testimonial-stars { color: #ffd700; font-size: 0.8rem; }
+        .testimonial-text { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+
+        /* Reward Banner */
+        .reward-banner {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reward-banner::before {
+            content: '🎁';
+            position: absolute;
+            right: -15px;
+            bottom: -15px;
+            font-size: 5rem;
+            opacity: 0.2;
+        }
+
+        .reward-icon {
+            font-size: 2.5rem;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .reward-content h3 { font-size: 1.1rem; margin-bottom: 3px; }
+        .reward-content p { font-size: 0.8rem; opacity: 0.8; }
+
+        /* Game Selection */
+        .game-selection-title {
+            text-align: center;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .game-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .game-card {
+            background: var(--card);
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .game-card.ff { background: linear-gradient(135deg, rgba(255,107,53,0.3), var(--card)); }
+        .game-card.bs { background: linear-gradient(135deg, rgba(0,180,216,0.3), var(--card)); }
+
+        .game-card.selected {
+            border-color: var(--success);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,255,136,0.3);
+        }
+
+        .game-card .icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .game-card h3 { font-size: 1.1rem; margin-bottom: 3px; }
+        .game-card p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .game-card .players {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 3px 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: var(--success);
+        }
+
+        .game-card .check {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: var(--success);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #000;
+        }
+
+        .game-card.selected .check { display: flex; }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .form-group label i { color: var(--primary); }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--card);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255,70,85,0.2);
+        }
+
+        /* Rules */
+        .rules-box {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid var(--warning);
+        }
+
+        .rules-box h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--warning);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .rules-box ul { list-style: none; }
+
+        .rules-box li {
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .rules-box li i { color: var(--success); font-size: 0.7rem; }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #ff6b6b);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255,70,85,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255,70,85,0.5);
+        }
+
+        .btn-secondary { background: var(--card); color: var(--text); }
+        .btn-success { background: var(--success); color: #000; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
+
+        /* ========== SUSPENDED ========== */
+        .suspended-screen {
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a0000, #330000);
+            padding: 20px;
+        }
+
+        .suspended-screen.active { display: flex; }
+
+        .suspended-box {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            text-align: center;
+            border: 2px solid var(--danger);
+        }
+
+        .suspended-icon { font-size: 4rem; margin-bottom: 20px; }
+        .suspended-title { font-size: 1.5rem; color: var(--danger); margin-bottom: 10px; }
+
+        .suspended-reason {
+            background: rgba(255,68,68,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: var(--text-muted);
+        }
+
+        /* ========== MAIN APP ========== */
+        .main-app {
+            display: none;
+            padding-bottom: 70px;
+        }
+
+        .main-app.active { display: block; }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--secondary), var(--card));
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .user-avatar .level-badge {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            background: var(--leader);
+            color: #000;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .user-info h3 { font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+        .user-info p { font-size: 0.7rem; color: var(--text-muted); }
+
+        .game-badge {
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.55rem;
+            font-weight: bold;
+        }
+
+        .game-badge.ff { background: #ff6b35; }
+        .game-badge.bs { background: #00b4d8; }
+
+        .header-right { display: flex; gap: 8px; }
+
+        .header-btn {
+            width: 38px;
+            height: 38px;
+            background: var(--card);
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            position: relative;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .header-btn:hover { background: var(--primary); }
+
+        .header-btn .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            background: var(--danger);
+            border-radius: 50%;
+            font-size: 0.55rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== SECTIONS ========== */
+        .section {
+            display: none;
+            padding: 15px;
+        }
+
+        .section.active { display: block; }
+
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i { color: var(--primary); }
+
+        /* ========== HOME ========== */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-icon { font-size: 3rem; }
+        .welcome-text h2 { font-size: 1.2rem; margin-bottom: 5px; }
+        .welcome-text p { font-size: 0.85rem; opacity: 0.9; }
+
+        /* XP Card */
+        .xp-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .xp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .xp-header h4 { font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .xp-header span { font-size: 0.8rem; color: var(--accent); font-weight: bold; }
+
+        .xp-bar {
+            height: 12px;
+            background: var(--secondary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 6px;
+            transition: width 0.5s;
+            position: relative;
+        }
+
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: xp-shine 2s infinite;
+        }
+
+        @keyframes xp-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Daily Card */
+        .daily-card {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            color: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .daily-card::before {
+            content: '🎁';
+            position: absolute;
+            right: -15px;
+            bottom: -15px;
+            font-size: 5rem;
+            opacity: 0.2;
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .daily-header h3 { font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+
+        .daily-days {
+            display: flex;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-box {
+            width: 38px;
+            height: 45px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        .day-box i { font-size: 0.8rem; margin-bottom: 3px; }
+        .day-box.claimed { background: var(--success); color: #000; }
+        .day-box.current { background: white; color: #000; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Quick Actions */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-btn {
+            background: var(--card);
+            padding: 15px 8px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            color: var(--text);
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .quick-btn i { font-size: 1.4rem; color: var(--primary); margin-bottom: 8px; display: block; }
+        .quick-btn span { font-size: 0.7rem; }
+
+        /* Achievements */
+        .achievements-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .achievement-badge {
+            min-width: 70px;
+            background: var(--card);
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .achievement-badge.locked { opacity: 0.5; }
+
+        .achievement-badge .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 1.1rem;
+        }
+
+        .achievement-badge span { font-size: 0.65rem; color: var(--text-muted); }
+
+        /* Events */
+        .event-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .event-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .event-info { flex: 1; }
+        .event-info h4 { font-size: 0.9rem; margin-bottom: 3px; }
+        .event-info p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .event-time {
+            background: var(--secondary);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            color: var(--warning);
+        }
+
+        /* Leaderboard */
+        .leaderboard-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lb-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .lb-rank.r1 { background: #ffd700; color: #000; }
+        .lb-rank.r2 { background: #c0c0c0; color: #000; }
+        .lb-rank.r3 { background: #cd7f32; color: #000; }
+        .lb-rank.rn { background: var(--secondary); }
+
+        .lb-user { flex: 1; display: flex; align-items: center; gap: 10px; }
+
+        .lb-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .lb-name { font-size: 0.85rem; }
+        .lb-score { font-size: 0.85rem; color: var(--primary); font-weight: bold; }
+
+        /* Updates */
+        .update-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .update-card h3 { font-size: 0.95rem; margin-bottom: 5px; }
+        .update-card p { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* ========== GROUPS ========== */
+        .group-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .group-action-btn {
+            padding: 20px;
+            background: var(--card);
+            border: none;
+            border-radius: 15px;
+            color: var(--text);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .group-action-btn:hover {
+            border: 1px solid var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .group-action-btn i { font-size: 1.8rem; color: var(--primary); display: block; margin-bottom: 8px; }
+        .group-action-btn span { font-size: 0.85rem; }
+
+        .group-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .group-card:hover { transform: translateX(5px); }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .group-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .group-title { flex: 1; }
+        .group-title h4 { font-size: 0.95rem; margin-bottom: 3px; }
+        .group-title p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .group-code {
+            background: var(--secondary);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        .role-badge {
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            margin-left: 6px;
+        }
+
+        .role-badge.leader { background: var(--leader); color: #000; }
+        .role-badge.mod { background: var(--mod); color: #fff; }
+
+        .group-stats {
+            display: flex;
+            gap: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .group-stats span { display: flex; align-items: center; gap: 5px; }
+
+        /* ========== GROUP VIEW ========== */
+        .group-view {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--dark);
+            z-index: 200;
+        }
+
+        .group-view.active { display: flex; }
+
+        .gv-header {
+            background: linear-gradient(135deg, var(--card), var(--secondary));
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .gv-back {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 50%;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .gv-info { flex: 1; }
+        .gv-info h3 { font-size: 1.1rem; margin-bottom: 3px; }
+        .gv-info p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .gv-actions { display: flex; gap: 8px; }
+
+        .gv-actions button {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .members-scroll {
+            padding: 12px 15px;
+            background: var(--secondary);
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+        }
+
+        .member-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 60px;
+            cursor: pointer;
+        }
+
+        .member-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .member-avatar .role-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+        }
+
+        .role-dot.leader { background: var(--leader); }
+        .role-dot.mod { background: var(--mod); }
+        .role-dot.online { background: var(--success); }
+
+        .member-chip span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .gv-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: var(--dark);
+        }
+
+        .gv-input {
+            padding: 15px;
+            background: var(--card);
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .gv-input input {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 25px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .gv-input input:focus { outline: none; }
+
+        .gv-input button {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* ========== CHATS ========== */
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 18px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .chat-header.global { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .chat-header.ff { background: linear-gradient(135deg, #ff6b35, #ff4500); }
+        .chat-header.bs { background: linear-gradient(135deg, #00b4d8, #0077b6); }
+
+        .chat-header h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .chat-header p { font-size: 0.85rem; opacity: 0.9; }
+
+        .chat-box {
+            background: var(--card);
+            border-radius: 15px;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message.own { flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .msg-avatar.ff { background: #ff6b35; }
+        .msg-avatar.bs { background: #00b4d8; }
+
+        .msg-content { max-width: 75%; }
+
+        .msg-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+        }
+
+        .msg-name { font-weight: bold; }
+        .msg-time { color: var(--text-muted); font-size: 0.7rem; }
+
+        .msg-badge {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.55rem;
+            font-weight: bold;
+        }
+
+        .msg-badge.ff { background: #ff6b35; }
+        .msg-badge.bs { background: #00b4d8; }
+
+        .msg-text {
+            background: var(--secondary);
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .message.own .msg-text { background: var(--primary); }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 25px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .chat-input input:focus { outline: none; }
+
+        .chat-send {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* ========== PROFILE ========== */
+        .profile-cover {
+            height: 130px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 0 0 35px 35px;
+            position: relative;
+            margin-bottom: 55px;
+        }
+
+        .profile-avatar-box {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            border: 5px solid var(--dark);
+            position: relative;
+        }
+
+        .profile-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--card);
+            border: 3px solid var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .profile-online {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 3px solid var(--dark);
+        }
+
+        .profile-info {
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .verified-icon { color: var(--accent); font-size: 1.1rem; }
+
+        .profile-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .profile-badges-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, var(--leader), #ff8c00);
+            color: #000;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .profile-game-badge {
+            display: inline-block;
+            padding: 8px 18px;
+            background: var(--primary);
+            border-radius: 25px;
+            font-size: 0.85rem;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .profile-stat-box {
+            background: var(--card);
+            padding: 18px 8px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .profile-stat-box .value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .profile-stat-box .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .profile-achievements {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .profile-achievements h4 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-badges-grid {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .p-badge {
+            width: 55px;
+            height: 55px;
+            background: var(--card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .p-badge.earned {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255,70,85,0.3);
+        }
+
+        .download-card {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-card h3 { font-size: 1.2rem; margin-bottom: 8px; }
+        .download-card p { font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px; }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            background: white;
+            color: #000;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .profile-options { padding: 0 15px; }
+
+        .profile-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            background: var(--card);
+            border-radius: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-option:hover { transform: translateX(5px); }
+
+        .profile-option i {
+            width: 45px;
+            height: 45px;
+            background: var(--secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .profile-option .text { flex: 1; }
+        .profile-option .text h4 { font-size: 0.95rem; margin-bottom: 3px; }
+        .profile-option .text p { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* ========== BOTTOM NAV ========== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--card);
+            padding: 10px 8px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.2rem; }
+
+        /* ========== MODALS ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            width: 35px;
+            height: 35px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 50%;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            text-align: center;
+            padding: 30px;
+            background: var(--secondary);
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+
+        .code-box .code {
+            font-size: 2.2rem;
+            font-family: monospace;
+            letter-spacing: 10px;
+            color: var(--accent);
+        }
+
+        .code-box p { margin-top: 12px; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Advanced Settings */
+        .settings-section {
+            margin-bottom: 20px;
+        }
+
+        .settings-section-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: var(--secondary);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .setting-item .info h5 { font-size: 0.9rem; margin-bottom: 3px; }
+        .setting-item .info p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .toggle {
+            width: 52px;
+            height: 28px;
+            background: var(--card);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle.on { background: var(--primary); }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: 0.3s;
+        }
+
+        .toggle.on::after { left: 27px; }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .avatar-opt {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 3px solid transparent;
+            background: var(--secondary);
+            transition: all 0.3s;
+        }
+
+        .avatar-opt:hover { transform: scale(1.1); }
+        .avatar-opt.selected { border-color: var(--primary); box-shadow: 0 0 15px rgba(255,70,85,0.5); }
+
+        .help-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .help-link:hover { transform: translateY(-2px); }
+        .help-link.whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+        .help-link.telegram { background: linear-gradient(135deg, #0088cc, #0066aa); }
+        .help-link i { font-size: 1.5rem; }
+        .help-link span { font-size: 0.95rem; }
+
+        .member-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .member-btn.promote { background: var(--mod); color: white; }
+        .member-btn.demote { background: var(--warning); color: #000; }
+        .member-btn.kick { background: var(--danger); color: white; }
+        .member-btn.transfer { background: var(--leader); color: #000; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 15px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i { font-size: 3.5rem; margin-bottom: 15px; opacity: 0.5; }
+        .empty-state p { font-size: 0.9rem; }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--success);
+            color: #000;
+            padding: 14px 28px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            z-index: 2000;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { background: var(--danger); color: white; }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
+
+        .connection-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--danger);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            z-index: 3000;
+            display: none;
+        }
+
+        .connection-status.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        <i class="fas fa-wifi-slash"></i> ইন্টারনেট সংযোগ নেই...
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastText">Success!</span>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- SUSPENDED -->
+        <div class="suspended-screen" id="suspendedScreen">
+            <div class="suspended-box">
+                <div class="suspended-icon">🚫</div>
+                <h2 class="suspended-title">একাউন্ট সাসপেন্ড!</h2>
+                <p style="color: var(--text-muted);">আপনার একাউন্ট সাসপেন্ড করা হয়েছে</p>
+                <div class="suspended-reason">
+                    <strong>কারণ:</strong>
+                    <p id="suspendReasonText">নিয়ম ভঙ্গ</p>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 15px;" onclick="contactAdmin()">
+                    <i class="fas fa-headset"></i> এডমিনের সাথে যোগাযোগ
+                </button>
+                <button class="btn btn-danger" style="margin-top: 10px;" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> লগআউট
+                </button>
+            </div>
+        </div>
+
+        <!-- SIGNUP -->
+        <div class="auth-screen active" id="signupScreen">
+            <div class="auth-bg">
+                <span class="floating-icon" style="top: 10%; left: 10%;">🎮</span>
+                <span class="floating-icon" style="top: 20%; right: 15%;">🔥</span>
+                <span class="floating-icon" style="top: 50%; left: 5%;">⚡</span>
+                <span class="floating-icon" style="bottom: 30%; right: 10%;">👑</span>
+                <span class="floating-icon" style="bottom: 10%; left: 20%;">🎯</span>
+            </div>
+
+            <div class="auth-content">
+                <div class="auth-hero">
+                    <div class="auth-logo-box">
+                        <div class="auth-logo-ring"></div>
+                        <div class="auth-logo">🎮</div>
+                    </div>
+                    <h1 class="auth-title">Gaming Community</h1>
+                    <p class="auth-subtitle">বাংলাদেশের সেরা গেমিং কমিউনিটিতে স্বাগতম!</p>
+                    <div class="auth-tagline">
+                        <i class="fas fa-star"></i> FF & Blood Strike প্লেয়ারদের একমাত্র প্ল্যাটফর্ম
+                    </div>
+                </div>
+
+                <div class="live-counter">
+                    <span class="live-dot"></span>
+                    <span class="live-text"><span id="onlineCount">1,234</span> জন এখন অনলাইনে!</span>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <span class="icon">📥</span>
+                        <div class="value">50K+</div>
+                        <div class="label">ডাউনলোড</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="icon">👥</span>
+                        <div class="value">25K+</div>
+                        <div class="label">ইউজার</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="icon">⭐</span>
+                        <div class="value">4.8</div>
+                        <div class="label">রেটিং</div>
+                    </div>
+                </div>
+
+                <div class="features-box">
+                    <h3 class="features-title"><i class="fas fa-sparkles"></i> আমাদের ফিচারসমূহ</h3>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="icon"><i class="fas fa-users"></i></div>
+                            <h4>গ্রুপ চ্যাট</h4>
+                            <p>বন্ধুদের সাথে গ্রুপে কথা বলুন</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon"><i class="fas fa-globe"></i></div>
+                            <h4>গ্লোবাল চ্যাট</h4>
+                            <p>সবার সাথে যুক্ত থাকুন</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon"><i class="fas fa-crown"></i></div>
+                            <h4>লিডারবোর্ড</h4>
+                            <p>টপে যাওয়ার সুযোগ</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="icon"><i class="fas fa-gift"></i></div>
+                            <h4>ডেইলি রিওয়ার্ড</h4>
+                            <p>প্রতিদিন XP পুরস্কার</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">🔥</div>
+                        <div class="testimonial-info">
+                            <h5>ProGamer_BD</h5>
+                            <span>Free Fire Player</span>
+                        </div>
+                        <div class="testimonial-stars">★★★★★</div>
+                    </div>
+                    <p class="testimonial-text">"সেরা কমিউনিটি! এখানে অনেক ভালো টিমমেট পেয়েছি।"</p>
+                </div>
+
+                <div class="reward-banner">
+                    <div class="reward-icon">🎁</div>
+                    <div class="reward-content">
+                        <h3>সাইন আপ বোনাস!</h3>
+                        <p>এখনই জয়েন করে ১০০ XP ফ্রি পান!</p>
+                    </div>
+                </div>
+
+                <p class="game-selection-title"><i class="fas fa-gamepad"></i> আপনার পছন্দের গেম সিলেক্ট করুন</p>
+                <div class="game-selection">
+                    <div class="game-card ff" id="ffCard" onclick="selectGame('ff')">
+                        <span class="check"><i class="fas fa-check"></i></span>
+                        <div class="icon">🔥</div>
+                        <h3>Free Fire</h3>
+                        <p>Battle Royale</p>
+                        <span class="players"><i class="fas fa-users"></i> 15K+</span>
+                    </div>
+                    <div class="game-card bs" id="bsCard" onclick="selectGame('bs')">
+                        <span class="check"><i class="fas fa-check"></i></span>
+                        <div class="icon">⚡</div>
+                        <h3>Blood Strike</h3>
+                        <p>FPS Action</p>
+                        <span class="players"><i class="fas fa-users"></i> 10K+</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> আপনার নাম</label>
+                    <input type="text" id="signupName" placeholder="গেমার নেম দিন">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> ইমেইল</label>
+                    <input type="email" id="signupEmail" placeholder="আপনার ইমেইল">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> পাসওয়ার্ড</label>
+                    <input type="password" id="signupPassword" placeholder="কমপক্ষে ৬ অক্ষর">
+                </div>
+
+                <div class="rules-box">
+                    <h4><i class="fas fa-info-circle"></i> নিয়মাবলী</h4>
+                    <ul>
+                        <li><i class="fas fa-check"></i> গ্রুপ তৈরিকারী স্বয়ংক্রিয় লিডার হবে</li>
+                        <li><i class="fas fa-check"></i> লিডার মড নিয়োগ করতে পারবে</li>
+                        <li><i class="fas fa-check"></i> FF ও BS আলাদা চ্যাট রুম</li>
+                        <li><i class="fas fa-check"></i> গ্লোবালে সব গেমার থাকবে</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" id="signupBtn" onclick="signup()">
+                    <i class="fas fa-rocket"></i> একাউন্ট তৈরি করুন
+                </button>
+
+                <div class="auth-footer">
+                    একাউন্ট আছে? <a href="#" onclick="showLogin()">লগইন করুন</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="auth-screen" id="loginScreen">
+            <div class="auth-content">
+                <div class="auth-hero">
+                    <div class="auth-logo-box">
+                        <div class="auth-logo-ring"></div>
+                        <div class="auth-logo">👋</div>
+                    </div>
+                    <h1 class="auth-title">Welcome Back!</h1>
+                    <p class="auth-subtitle">আপনার একাউন্টে লগইন করুন</p>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> ইমেইল</label>
+                    <input type="email" id="loginEmail" placeholder="আপনার ইমেইল">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> পাসওয়ার্ড</label>
+                    <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড">
+                </div>
+
+                <button class="btn btn-primary" id="loginBtn" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> লগইন
+                </button>
+
+                <div class="auth-footer">
+                    একাউন্ট নেই? <a href="#" onclick="showSignup()">সাইন আপ করুন</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN APP -->
+        <div class="main-app" id="mainApp">
+            <div class="app-header">
+                <div class="header-left">
+                    <div class="user-avatar" id="headerAvatar">🔥<span class="level-badge" id="headerLevel">Lv.1</span></div>
+                    <div class="user-info">
+                        <h3><span id="headerName">Gamer</span> <span class="game-badge ff" id="headerBadge">FF</span></h3>
+                        <p id="headerGame">Free Fire</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" onclick="showSection('globalChat')"><i class="fas fa-globe"></i></button>
+                    <button class="header-btn" onclick="openModal('notifModal')"><i class="fas fa-bell"></i><span class="badge">0</span></button>
+                    <button class="header-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+
+            <!-- HOME -->
+            <div class="section active" id="homeSection">
+                <div class="welcome-banner">
+                    <div class="welcome-content">
+                        <div class="welcome-icon" id="bannerIcon">🔥</div>
+                        <div class="welcome-text">
+                            <h2 id="bannerTitle">Free Fire Zone</h2>
+                            <p>স্বাগতম, <span id="welcomeName">Gamer</span>!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xp-card">
+                    <div class="xp-header">
+                        <h4><i class="fas fa-star" style="color: var(--leader);"></i> Level <span id="userLevel">1</span></h4>
+                        <span id="xpText">0/100 XP</span>
+                    </div>
+                    <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width: 0%;"></div></div>
+                    <div class="xp-info">
+                        <span>প্রতি মেসেজ = 5 XP</span>
+                        <span>পরের লেভেল: <span id="nextLevelXp">100</span> XP</span>
+                    </div>
+                </div>
+
+                <div class="daily-card">
+                    <div class="daily-header">
+                        <h3><i class="fas fa-gift"></i> ডেইলি রিওয়ার্ড</h3>
+                        <span>Day <span id="currentDay">1</span>/7</span>
+                    </div>
+                    <div class="daily-days" id="dailyDays"></div>
+                    <button class="btn btn-success" style="margin-top: 12px;" onclick="claimDaily()">
+                        <i class="fas fa-hand-pointer"></i> ক্লেইম করুন
+                    </button>
+                </div>
+
+                <div class="quick-grid">
+                    <button class="quick-btn" onclick="showSection('groups')"><i class="fas fa-users"></i><span>গ্রুপস</span></button>
+                    <button class="quick-btn" onclick="showSection('globalChat')"><i class="fas fa-globe"></i><span>গ্লোবাল</span></button>
+                    <button class="quick-btn" onclick="showSection('gameChat')"><i class="fas fa-gamepad"></i><span>গেম চ্যাট</span></button>
+                    <button class="quick-btn" onclick="openModal('inviteModal')"><i class="fas fa-user-plus"></i><span>ইনভাইট</span></button>
+                </div>
+
+                <h3 class="section-title"><i class="fas fa-trophy"></i> অ্যাচিভমেন্ট</h3>
+                <div class="achievements-row" id="achievementsList"></div>
+
+                <h3 class="section-title"><i class="fas fa-calendar-alt"></i> ইভেন্টস</h3>
+                <div class="event-card">
+                    <div class="event-icon">🏆</div>
+                    <div class="event-info"><h4>উইকলি টুর্নামেন্ট</h4><p>স্কোয়াড নিয়ে অংশগ্রহণ করুন</p></div>
+                    <span class="event-time">2 দিন</span>
+                </div>
+                <div class="event-card">
+                    <div class="event-icon">🎯</div>
+                    <div class="event-info"><h4>হেডশট চ্যালেঞ্জ</h4><p>সেরা স্নাইপার হোন</p></div>
+                    <span class="event-time">5 দিন</span>
+                </div>
+
+                <h3 class="section-title"><i class="fas fa-medal"></i> লিডারবোর্ড</h3>
+                <div id="leaderboardList"></div>
+
+                <h3 class="section-title"><i class="fas fa-fire"></i> আপডেটস</h3>
+                <div id="updatesContainer"></div>
+            </div>
+
+            <!-- GROUPS -->
+            <div class="section" id="groupsSection">
+                <h2 class="section-title"><i class="fas fa-users"></i> আমার গ্রুপস</h2>
+
+                <div class="group-actions">
+                    <button class="group-action-btn" onclick="openModal('createGroupModal')">
+                        <i class="fas fa-plus-circle"></i><span>গ্রুপ তৈরি</span>
+                    </button>
+                    <button class="group-action-btn" onclick="openModal('joinGroupModal')">
+                        <i class="fas fa-sign-in-alt"></i><span>জয়েন করুন</span>
+                    </button>
+                </div>
+
+                <div id="groupsList"></div>
+            </div>
+
+            <!-- GROUP VIEW -->
+            <div class="group-view" id="groupView">
+                <div class="gv-header">
+                    <button class="gv-back" onclick="closeGroupView()"><i class="fas fa-arrow-left"></i></button>
+                    <div class="gv-info"><h3 id="gvName">গ্রুপ</h3><p id="gvMembers">0 সদস্য</p></div>
+                    <div class="gv-actions">
+                        <button onclick="openModal('groupInfoModal')"><i class="fas fa-info-circle"></i></button>
+                        <button onclick="openModal('groupSettingsModal')"><i class="fas fa-cog"></i></button>
+                    </div>
+                </div>
+                <div class="members-scroll" id="gvMembersList"></div>
+                <div class="gv-messages" id="gvMessages"></div>
+                <div class="gv-input">
+                    <input type="text" id="gvInput" placeholder="মেসেজ লিখুন..." onkeypress="if(event.key==='Enter')sendGroupMsg()">
+                    <button onclick="sendGroupMsg()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+            <!-- GLOBAL CHAT -->
+            <div class="section" id="globalChatSection">
+                <h2 class="section-title"><i class="fas fa-globe"></i> গ্লোবাল চ্যাট</h2>
+                <div class="chat-header global"><h3>🌍 গ্লোবাল চ্যাট</h3><p>FF ও BS সবাই এখানে কথা বলতে পারবে</p></div>
+                <div class="chat-box">
+                    <div class="chat-messages" id="globalMessages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="globalInput" placeholder="মেসেজ লিখুন..." onkeypress="if(event.key==='Enter')sendGlobal()">
+                        <button class="chat-send" onclick="sendGlobal()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME CHAT -->
+            <div class="section" id="gameChatSection">
+                <h2 class="section-title"><i class="fas fa-gamepad"></i> <span id="gameChatTitle">FF চ্যাট</span></h2>
+                <div class="chat-header" id="gameChatHeader"><h3 id="gameChatName">🔥 Free Fire চ্যাট</h3><p id="gameChatDesc">শুধু FF প্লেয়ার</p></div>
+                <div class="chat-box">
+                    <div class="chat-messages" id="gameMessages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="gameInput" placeholder="মেসেজ লিখুন..." onkeypress="if(event.key==='Enter')sendGame()">
+                        <button class="chat-send" onclick="sendGame()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFILE -->
+            <div class="section" id="profileSection">
+                <div class="profile-cover">
+                    <div class="profile-avatar-box">
+                        <div class="profile-avatar" id="profileAvatar">
+                            🔥
+                            <div class="profile-online"></div>
+                            <div class="profile-edit" onclick="openModal('editProfileModal')"><i class="fas fa-camera"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-info">
+                    <h2 class="profile-name">
+                        <span id="profileName">Gamer</span>
+                        <i class="fas fa-check-circle verified-icon"></i>
+                    </h2>
+                    <p class="profile-email" id="profileEmail">email@example.com</p>
+                    <div class="profile-badges-row">
+                        <span class="profile-level-badge" id="profileLevel"><i class="fas fa-star"></i> Level 1</span>
+                        <span class="profile-game-badge" id="profileGame">Free Fire</span>
+                    </div>
+                </div>
+
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-box"><span class="value" id="statGroups">0</span><span class="label">গ্রুপস</span></div>
+                    <div class="profile-stat-box"><span class="value" id="statMessages">0</span><span class="label">মেসেজ</span></div>
+                    <div class="profile-stat-box"><span class="value" id="statXP">0</span><span class="label">XP</span></div>
+                    <div class="profile-stat-box"><span class="value" id="statDays">1</span><span class="label">দিন</span></div>
+                </div>
+
+                <div class="profile-achievements">
+                    <h4><i class="fas fa-award"></i> অর্জিত ব্যাজ</h4>
+                    <div class="profile-badges-grid" id="profileBadges"></div>
+                </div>
+
+                <div class="download-card">
+                    <h3><i class="fas fa-download"></i> অ্যাপ ডাউনলোড করুন</h3>
+                    <p>আরো ভালো এক্সপেরিয়েন্সের জন্য</p>
+                    <a href="#" class="download-btn" id="downloadLink" target="_blank"><i class="fab fa-android"></i> Download APK</a>
+                </div>
+
+                <div class="profile-options">
+                    <div class="profile-option" onclick="openModal('editProfileModal')">
+                        <i class="fas fa-edit"></i>
+                        <div class="text"><h4>প্রোফাইল এডিট</h4><p>নাম ও অ্যাভাটার পরিবর্তন</p></div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                    </div>
+                    <div class="profile-option" onclick="openModal('helpModal')">
+                        <i class="fas fa-question-circle"></i>
+                        <div class="text"><h4>হেল্প ও সাপোর্ট</h4><p>সমস্যা? আমাদের জানান</p></div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                    </div>
+                    <div class="profile-option" onclick="logout()" style="border: 1px solid var(--danger);">
+                        <i class="fas fa-sign-out-alt" style="color: var(--danger);"></i>
+                        <div class="text"><h4 style="color: var(--danger);">লগআউট</h4><p>একাউন্ট থেকে বের হন</p></div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM NAV -->
+            <div class="bottom-nav" id="bottomNav">
+                <button class="nav-item active" id="navHome" onclick="showSection('home')"><i class="fas fa-home"></i><span>হোম</span></button>
+                <button class="nav-item" id="navGroups" onclick="showSection('groups')"><i class="fas fa-users"></i><span>গ্রুপস</span></button>
+                <button class="nav-item" id="navGlobalChat" onclick="showSection('globalChat')"><i class="fas fa-globe"></i><span>গ্লোবাল</span></button>
+                <button class="nav-item" id="navGameChat" onclick="showSection('gameChat')"><i class="fas fa-gamepad"></i><span id="navGameLabel">FF</span></button>
+                <button class="nav-item" id="navProfile" onclick="showSection('profile')"><i class="fas fa-user"></i><span>প্রোফাইল</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-users"></i> গ্রুপ তৈরি</h3><button class="modal-close" onclick="closeModal('createGroupModal')">✕</button></div>
+            <div class="form-group"><label>গ্রুপের নাম</label><input type="text" id="groupName" placeholder="গ্রুপের নাম দিন"></div>
+            <div class="form-group"><label>বিবরণ (অপশনাল)</label><input type="text" id="groupDesc" placeholder="গ্রুপ সম্পর্কে লিখুন"></div>
+            <button class="btn btn-primary" id="createGroupBtn" onclick="createGroup()"><i class="fas fa-plus"></i> তৈরি করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="joinGroupModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-sign-in-alt"></i> গ্রুপে জয়েন</h3><button class="modal-close" onclick="closeModal('joinGroupModal')">✕</button></div>
+            <div class="form-group"><label>৬ সংখ্যার কোড</label><input type="text" id="joinCode" placeholder="123456" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 8px;"></div>
+            <button class="btn btn-primary" id="joinGroupBtn" onclick="joinGroup()"><i class="fas fa-sign-in-alt"></i> জয়েন করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-key"></i> গ্রুপ কোড</h3><button class="modal-close" onclick="closeModal('codeModal')">✕</button></div>
+            <div class="code-box"><div class="code" id="displayCode">123456</div><p>বন্ধুদের এই কোড শেয়ার করুন</p></div>
+            <button class="btn btn-primary" onclick="copyCode()"><i class="fas fa-copy"></i> কোড কপি করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="groupSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-cog"></i> গ্রুপ সেটিংস</h3><button class="modal-close" onclick="closeModal('groupSettingsModal')">✕</button></div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title"><i class="fas fa-info-circle"></i> বেসিক</div>
+                <div class="form-group"><label>গ্রুপের নাম</label><input type="text" id="editGroupName" placeholder="নাম"></div>
+                <div class="form-group"><label>বিবরণ</label><input type="text" id="editGroupDesc" placeholder="বিবরণ"></div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title"><i class="fas fa-lock"></i> প্রাইভেসি</div>
+                <div class="setting-item">
+                    <div class="info"><h5>শুধু মড মেসেজ</h5><p>শুধু লিডার ও মড মেসেজ দিতে পারবে</p></div>
+                    <div class="toggle" id="toggleModOnly" onclick="toggleSet('toggleModOnly')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="info"><h5>মিউট নিউ মেম্বার</h5><p>নতুন মেম্বার ১ ঘণ্টা মিউট</p></div>
+                    <div class="toggle" id="toggleMuteNew" onclick="toggleSet('toggleMuteNew')"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title"><i class="fas fa-shield-alt"></i> পারমিশন</div>
+                <div class="setting-item">
+                    <div class="info"><h5>মড ইনভাইট করতে পারবে</h5><p>মড নতুন মেম্বার অ্যাড করতে পারবে</p></div>
+                    <div class="toggle on" id="toggleModInvite" onclick="toggleSet('toggleModInvite')"></div>
+                </div>
+                <div class="setting-item">
+                    <div class="info"><h5>মড কিক করতে পারবে</h5><p>মড মেম্বার রিমুভ করতে পারবে</p></div>
+                    <div class="toggle on" id="toggleModKick" onclick="toggleSet('toggleModKick')"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveGroupSettings()"><i class="fas fa-save"></i> সেভ করুন</button>
+            <button class="btn btn-danger" style="margin-top: 10px;" onclick="leaveGroup()"><i class="fas fa-sign-out-alt"></i> গ্রুপ ছাড়ুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="groupInfoModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-info-circle"></i> গ্রুপ ইনফো</h3><button class="modal-close" onclick="closeModal('groupInfoModal')">✕</button></div>
+            <div class="code-box"><div class="code" id="groupInfoCode">123456</div><p>গ্রুপ কোড</p></div>
+            <div style="padding: 15px; background: var(--secondary); border-radius: 12px; margin-bottom: 12px;">
+                <p style="margin-bottom: 8px;"><i class="fas fa-calendar"></i> তৈরি: <span id="groupCreated">-</span></p>
+                <p><i class="fas fa-user"></i> লিডার: <span id="groupLeader">-</span></p>
+            </div>
+            <button class="btn btn-primary" onclick="copyGroupCode()"><i class="fas fa-copy"></i> কোড কপি করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="memberModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-user"></i> মেম্বার</h3><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem;" id="memberAvatar">🔥</div>
+                <h3 id="memberName" style="font-size: 1.2rem;">User</h3>
+                <span class="role-badge" id="memberRole" style="margin-top: 8px; display: inline-block;">Member</span>
+            </div>
+            <div id="memberActions"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-edit"></i> প্রোফাইল এডিট</h3><button class="modal-close" onclick="closeModal('editProfileModal')">✕</button></div>
+            <label style="color: var(--text-muted); font-size: 0.9rem;">অ্যাভাটার সিলেক্ট করুন</label>
+            <div class="avatar-grid" id="avatarGrid"></div>
+            <div class="form-group"><label>নাম</label><input type="text" id="editName" placeholder="আপনার নাম"></div>
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> সেভ করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="notifModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-bell"></i> নোটিফিকেশন</h3><button class="modal-close" onclick="closeModal('notifModal')">✕</button></div>
+            <div class="setting-item">
+                <div class="info"><h5>মেসেজ নোটিফিকেশন</h5><p>নতুন মেসেজের নোটিফিকেশন</p></div>
+                <div class="toggle on" id="toggleMsg" onclick="toggleSet('toggleMsg')"></div>
+            </div>
+            <div class="setting-item">
+                <div class="info"><h5>গ্রুপ নোটিফিকেশন</h5><p>গ্রুপ অ্যাক্টিভিটির নোটিফিকেশন</p></div>
+                <div class="toggle on" id="toggleGrp" onclick="toggleSet('toggleGrp')"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="inviteModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-share-alt"></i> বন্ধুদের ইনভাইট</h3><button class="modal-close" onclick="closeModal('inviteModal')">✕</button></div>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 15px;">আপনার বন্ধুদের এই অ্যাপে ইনভাইট করুন!</p>
+            <button class="btn btn-primary" onclick="shareApp()"><i class="fas fa-share"></i> শেয়ার করুন</button>
+        </div>
+    </div>
+
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3><i class="fas fa-question-circle"></i> হেল্প ও সাপোর্ট</h3><button class="modal-close" onclick="closeModal('helpModal')">✕</button></div>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 15px;">কোনো সমস্যা হলে এডমিনের সাথে যোগাযোগ করুন</p>
+            <a href="#" target="_blank" class="help-link whatsapp" id="waLink"><i class="fab fa-whatsapp"></i><span>WhatsApp এ মেসেজ করুন</span></a>
+            <a href="#" target="_blank" class="help-link telegram" id="tgLink"><i class="fab fa-telegram"></i><span>Telegram এ মেসেজ করুন</span></a>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT_0W3eL5Ipd2yzo-kR4NsggWqXoH_oJg",
+            authDomain: "earning-pro-bot.firebaseapp.com",
+            databaseURL: "https://earning-pro-bot-default-rtdb.firebaseio.com",
+            projectId: "earning-pro-bot",
+            storageBucket: "earning-pro-bot.firebasestorage.app",
+            messagingSenderId: "917121638705",
+            appId: "1:917121638705:web:bd9517193c42d19d0e5010"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let user = null;
+        let selectedGame = null;
+        let selectedAvatar = '🔥';
+        let currentGroupId = null;
+        let currentGroup = null;
+
+        const avatars = ['🔥', '⚡', '👑', '🎯', '🎮', '⭐', '💎', '🦁', '🐉', '🤖'];
+        const updates = {
+            ff: [{ title: '🔥 OB45 আপডেট!', desc: 'নতুন ক্যারেক্টার ও ম্যাপ' }, { title: '🏆 র‍্যাংক সিজন ৩৫', desc: 'নতুন র‍্যাংক রিওয়ার্ড' }],
+            bs: [{ title: '⚡ সিজন ৬ শুরু!', desc: 'নতুন উইপন স্কিন' }, { title: '🎯 নিউ ম্যাপ', desc: 'এক্সক্লুসিভ ম্যাপ' }]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('onlineCount').textContent = (Math.floor(Math.random() * 2000) + 500).toLocaleString();
+            loadAppSettings();
+
+            const grid = document.getElementById('avatarGrid');
+            avatars.forEach(a => {
+                const div = document.createElement('div');
+                div.className = 'avatar-opt' + (a === '🔥' ? ' selected' : '');
+                div.textContent = a;
+                div.onclick = () => {
+                    document.querySelectorAll('.avatar-opt').forEach(x => x.classList.remove('selected'));
+                    div.classList.add('selected');
+                    selectedAvatar = a;
+                };
+                grid.appendChild(div);
+            });
+
+            renderDailyDays();
+            renderAchievements();
+            auth.onAuthStateChanged(u => { if (u) loadUser(u.uid); });
+        });
+
+        function loadAppSettings() {
+            db.ref('settings').once('value').then(snap => {
+                const s = snap.val() || {};
+                if (s.whatsapp) document.getElementById('waLink').href = s.whatsapp;
+                if (s.telegram) document.getElementById('tgLink').href = s.telegram;
+                if (s.apkLink) document.getElementById('downloadLink').href = s.apkLink;
+            });
+        }
+
+        function showLogin() { document.getElementById('signupScreen').classList.remove('active'); document.getElementById('loginScreen').classList.add('active'); }
+        function showSignup() { document.getElementById('loginScreen').classList.remove('active'); document.getElementById('signupScreen').classList.add('active'); }
+
+        function selectGame(g) {
+            selectedGame = g;
+            document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(g + 'Card').classList.add('selected');
+        }
+
+        function signup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const pass = document.getElementById('signupPassword').value;
+
+            if (!selectedGame) return toast('গেম সিলেক্ট করুন!', true);
+            if (!name) return toast('নাম দিন!', true);
+            if (!email) return toast('ইমেইল দিন!', true);
+            if (pass.length < 6) return toast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর!', true);
+
+            const btn = document.getElementById('signupBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> অপেক্ষা করুন...';
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then(cred => db.ref('users/' + cred.user.uid).set({
+                    name, email, game: selectedGame, avatar: selectedGame === 'ff' ? '🔥' : '⚡',
+                    createdAt: Date.now(), messageCount: 0, xp: 100, level: 1, dailyDay: 0, lastClaim: 0, online: true, suspended: false
+                }))
+                .then(() => toast('একাউন্ট তৈরি! +100 XP বোনাস! 🎉'))
+                .catch(e => toast(e.code === 'auth/email-already-in-use' ? 'ইমেইল ইতিমধ্যে ব্যবহৃত!' : 'সমস্যা হয়েছে!', true))
+                .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-rocket"></i> একাউন্ট তৈরি করুন'; });
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+
+            if (!email || !pass) return toast('ইমেইল ও পাসওয়ার্ড দিন!', true);
+
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> লগইন হচ্ছে...';
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => toast('লগইন সফল! 🎉'))
+                .catch(() => toast('ইমেইল বা পাসওয়ার্ড ভুল!', true))
+                .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> লগইন'; });
+        }
+
+        function loadUser(uid) {
+            db.ref('users/' + uid).on('value', snap => {
+                if (snap.exists()) {
+                    user = snap.val(); user.uid = uid;
+                    if (user.suspended) {
+                        document.getElementById('signupScreen').classList.remove('active');
+                        document.getElementById('loginScreen').classList.remove('active');
+                        document.getElementById('mainApp').classList.remove('active');
+                        document.getElementById('suspendedScreen').classList.add('active');
+                        document.getElementById('suspendReasonText').textContent = user.suspendReason || 'নিয়ম ভঙ্গ';
+                        return;
+                    }
+                    document.getElementById('suspendedScreen').classList.remove('active');
+                    document.body.className = user.game + '-theme';
+                    document.getElementById('signupScreen').classList.remove('active');
+                    document.getElementById('loginScreen').classList.remove('active');
+                    document.getElementById('mainApp').classList.add('active');
+                    updateUI();
+                    loadGroups(); loadGlobalChat(); loadGameChat(); loadLeaderboard();
+                    db.ref('users/' + uid + '/online').set(true);
+                    db.ref('users/' + uid + '/online').onDisconnect().set(false);
+                }
+            });
+        }
+
+        function contactAdmin() { openModal('helpModal'); }
+
+        function updateUI() {
+            if (!user) return;
+            const gn = user.game === 'ff' ? 'Free Fire' : 'Blood Strike';
+            const gi = user.game === 'ff' ? '🔥' : '⚡';
+            const level = user.level || 1;
+            const xp = user.xp || 0;
+            const nextXp = level * 100;
+
+            document.getElementById('headerAvatar').innerHTML = (user.avatar || gi) + `<span class="level-badge">Lv.${level}</span>`;
+            document.getElementById('headerName').textContent = user.name;
+            document.getElementById('headerBadge').textContent = user.game.toUpperCase();
+            document.getElementById('headerBadge').className = 'game-badge ' + user.game;
+            document.getElementById('headerGame').textContent = gn;
+            document.getElementById('bannerIcon').textContent = gi;
+            document.getElementById('bannerTitle').textContent = gn + ' Zone';
+            document.getElementById('welcomeName').textContent = user.name;
+            document.getElementById('userLevel').textContent = level;
+            document.getElementById('xpText').textContent = xp + '/' + nextXp + ' XP';
+            document.getElementById('xpFill').style.width = Math.min((xp / nextXp) * 100, 100) + '%';
+            document.getElementById('nextLevelXp').textContent = nextXp;
+            document.getElementById('currentDay').textContent = (user.dailyDay || 0) + 1;
+            document.getElementById('profileAvatar').innerHTML = (user.avatar || gi) + '<div class="profile-online"></div><div class="profile-edit" onclick="openModal(\'editProfileModal\')"><i class="fas fa-camera"></i></div>';
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('profileLevel').innerHTML = '<i class="fas fa-star"></i> Level ' + level;
+            document.getElementById('profileGame').textContent = gn;
+            document.getElementById('profileGame').style.background = user.game === 'ff' ? '#ff6b35' : '#00b4d8';
+            document.getElementById('statMessages').textContent = user.messageCount || 0;
+            document.getElementById('statXP').textContent = xp;
+            document.getElementById('statDays').textContent = Math.ceil((Date.now() - user.createdAt) / 86400000) || 1;
+            document.getElementById('editName').value = user.name;
+            document.getElementById('navGameLabel').textContent = user.game.toUpperCase();
+            document.getElementById('gameChatTitle').textContent = user.game.toUpperCase() + ' চ্যাট';
+            document.getElementById('gameChatName').textContent = gi + ' ' + gn + ' চ্যাট';
+            document.getElementById('gameChatDesc').textContent = 'শুধু ' + gn + ' প্লেয়ার';
+            document.getElementById('gameChatHeader').className = 'chat-header ' + user.game;
+            renderDailyDays();
+
+            let badges = '';
+            if (user.messageCount >= 1) badges += '<div class="p-badge earned">💬</div>';
+            else badges += '<div class="p-badge">💬</div>';
+            if (level >= 5) badges += '<div class="p-badge earned">⭐</div>';
+            else badges += '<div class="p-badge">⭐</div>';
+            badges += '<div class="p-badge">👑</div>';
+            badges += '<div class="p-badge">🏆</div>';
+            document.getElementById('profileBadges').innerHTML = badges;
+
+            document.getElementById('updatesContainer').innerHTML = updates[user.game].map(u =>
+                `<div class="update-card"><h3>${u.title}</h3><p>${u.desc}</p></div>`
+            ).join('');
+        }
+
+        function logout() {
+            if (confirm('লগআউট করবেন?')) {
+                if (user) { db.ref('users/' + user.uid).off(); db.ref('users/' + user.uid + '/online').set(false); }
+                auth.signOut().then(() => {
+                    user = null; document.body.className = '';
+                    document.getElementById('mainApp').classList.remove('active');
+                    document.getElementById('suspendedScreen').classList.remove('active');
+                    document.getElementById('signupScreen').classList.add('active');
+                    document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
+                    selectedGame = null;
+                    toast('লগআউট সফল!');
+                });
+            }
+        }
+
+        function showSection(s) {
+            document.getElementById('groupView').classList.remove('active');
+            document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            const map = { home: 'homeSection', groups: 'groupsSection', globalChat: 'globalChatSection', gameChat: 'gameChatSection', profile: 'profileSection' };
+            document.getElementById(map[s]).classList.add('active');
+            document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1)).classList.add('active');
+            document.getElementById('bottomNav').style.display = 'flex';
+            if (s === 'groups') loadGroups();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            if (id === 'editProfileModal' && user) {
+                selectedAvatar = user.avatar || '🔥';
+                document.querySelectorAll('.avatar-opt').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.textContent === selectedAvatar) opt.classList.add('selected');
+                });
+            }
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function toggleSet(id) { document.getElementById(id).classList.toggle('on'); }
+
+        function renderDailyDays() {
+            const day = user ? (user.dailyDay || 0) : 0;
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const cls = i < day ? 'claimed' : i === day ? 'current' : '';
+                const icon = i < day ? 'fa-check' : 'fa-gift';
+                html += `<div class="day-box ${cls}"><i class="fas ${icon}"></i><span>${i + 1}</span></div>`;
+            }
+            document.getElementById('dailyDays').innerHTML = html;
+        }
+
+        function claimDaily() {
+            if (!user) return;
+            const today = new Date().toDateString();
+            const lastClaim = user.lastClaim ? new Date(user.lastClaim).toDateString() : null;
+            if (lastClaim === today) return toast('আজকে ক্লেইম করেছেন!', true);
+            const newDay = Math.min((user.dailyDay || 0) + 1, 7);
+            const xpReward = newDay * 10;
+            db.ref('users/' + user.uid).update({ dailyDay: newDay === 7 ? 0 : newDay, lastClaim: Date.now(), xp: (user.xp || 0) + xpReward })
+                .then(() => toast(`Day ${newDay} ক্লেইম! +${xpReward} XP! 🎁`));
+        }
+
+        function renderAchievements() {
+            document.getElementById('achievementsList').innerHTML = [
+                { icon: '💬', name: 'প্রথম মেসেজ' }, { icon: '⭐', name: 'লেভেল ৫' }, { icon: '👑', name: 'গ্রুপ লিডার' }, { icon: '🏆', name: 'টপ ১০' }
+            ].map(a => `<div class="achievement-badge locked"><div class="icon">${a.icon}</div><span>${a.name}</span></div>`).join('');
+        }
+
+        function loadLeaderboard() {
+            db.ref('users').orderByChild('xp').limitToLast(5).once('value').then(snap => {
+                const users = []; snap.forEach(c => users.push({ ...c.val(), uid: c.key })); users.reverse();
+                document.getElementById('leaderboardList').innerHTML = users.map((u, i) =>
+                    `<div class="leaderboard-card"><div class="lb-rank ${i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn'}">${i + 1}</div><div class="lb-user"><div class="lb-avatar" style="background: ${u.game === 'ff' ? '#ff6b35' : '#00b4d8'};">${u.avatar || '?'}</div><span class="lb-name">${u.name || 'Unknown'}</span></div><span class="lb-score">${u.xp || 0} XP</span></div>`
+                ).join('');
+            });
+        }
+
+        function createGroup() {
+            const name = document.getElementById('groupName').value.trim();
+            const desc = document.getElementById('groupDesc').value.trim();
+            if (!name) return toast('গ্রুপের নাম দিন!', true);
+
+            const btn = document.getElementById('createGroupBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="loading"></span>';
+
+            const code = String(Math.floor(100000 + Math.random() * 900000));
+            db.ref('groups').push({
+                name, desc: desc || '', code, game: user.game, createdAt: Date.now(),
+                settings: { modOnly: false, muteNew: false, modInvite: true, modKick: true },
+                members: { [user.uid]: { name: user.name, avatar: user.avatar, role: 'leader', joinedAt: Date.now() } }
+            }).then(() => {
+                closeModal('createGroupModal');
+                document.getElementById('groupName').value = '';
+                document.getElementById('groupDesc').value = '';
+                document.getElementById('displayCode').textContent = code;
+                openModal('codeModal');
+                loadGroups();
+                toast('গ্রুপ তৈরি সফল! 👑');
+            }).finally(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> তৈরি করুন'; });
+        }
+
+        function joinGroup() {
+            const code = document.getElementById('joinCode').value.trim();
+            if (code.length !== 6) return toast('৬ সংখ্যার কোড দিন!', true);
+
+            const btn = document.getElementById('joinGroupBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="loading"></span>';
+
+            db.ref('groups').orderByChild('code').equalTo(code).once('value').then(snap => {
+                if (!snap.exists()) return toast('কোড ভুল!', true);
+                let joined = false;
+                snap.forEach(c => {
+                    if (joined) return;
+                    const g = c.val();
+                    if (g.game !== user.game) return toast('এটা ' + (g.game === 'ff' ? 'FF' : 'BS') + ' গ্রুপ!', true);
+                    if (g.members && g.members[user.uid]) return toast('আগেই আছেন!', true);
+                    db.ref('groups/' + c.key + '/members/' + user.uid).set({ name: user.name, avatar: user.avatar, role: 'member', joinedAt: Date.now() }).then(() => {
+                        joined = true;
+                        closeModal('joinGroupModal');
+                        document.getElementById('joinCode').value = '';
+                        loadGroups();
+                        toast('গ্রুপে জয়েন সফল! 🎉');
+                    });
+                });
+            }).finally(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> জয়েন করুন'; });
+        }
+
+        function loadGroups() {
+            if (!user) return;
+            db.ref('groups').orderByChild('game').equalTo(user.game).once('value').then(snap => {
+                let html = '', count = 0;
+                snap.forEach(c => {
+                    const g = c.val();
+                    if (g.members && g.members[user.uid]) {
+                        count++;
+                        const mc = Object.keys(g.members).length;
+                        const myRole = g.members[user.uid].role;
+                        const badge = myRole === 'leader' ? '<span class="role-badge leader">👑 লিডার</span>' : myRole === 'mod' ? '<span class="role-badge mod">🛡️ মড</span>' : '';
+                        html += `<div class="group-card" onclick="openGroup('${c.key}')"><div class="group-header"><div class="group-avatar">${g.name.charAt(0)}</div><div class="group-title"><h4>${g.name} ${badge}</h4><p>${g.desc || 'বিবরণ নেই'}</p></div><div class="group-code">${g.code}</div></div><div class="group-stats"><span><i class="fas fa-users"></i> ${mc} সদস্য</span><span><i class="fas fa-gamepad"></i> ${user.game.toUpperCase()}</span></div></div>`;
+                    }
+                });
+                document.getElementById('statGroups').textContent = count;
+                document.getElementById('groupsList').innerHTML = html || '<div class="empty-state"><i class="fas fa-users"></i><p>কোনো গ্রুপ নেই<br>নতুন গ্রুপ তৈরি করুন বা জয়েন করুন</p></div>';
+            });
+        }
+
+        function openGroup(gid) {
+            currentGroupId = gid;
+            db.ref('groups/' + gid).once('value').then(snap => {
+                if (!snap.exists()) return;
+                currentGroup = snap.val(); currentGroup.id = gid;
+                document.getElementById('gvName').textContent = currentGroup.name;
+                document.getElementById('gvMembers').textContent = Object.keys(currentGroup.members).length + ' সদস্য';
+                document.getElementById('groupInfoCode').textContent = currentGroup.code;
+                document.getElementById('groupCreated').textContent = new Date(currentGroup.createdAt).toLocaleDateString('bn-BD');
+                document.getElementById('editGroupName').value = currentGroup.name;
+                document.getElementById('editGroupDesc').value = currentGroup.desc || '';
+                Object.entries(currentGroup.members).forEach(([u, m]) => { if (m.role === 'leader') document.getElementById('groupLeader').textContent = m.name; });
+                renderMembers();
+                loadGroupChat();
+                document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+                document.getElementById('bottomNav').style.display = 'none';
+                document.getElementById('groupView').classList.add('active');
+            });
+        }
+
+        function closeGroupView() {
+            document.getElementById('groupView').classList.remove('active');
+            if (currentGroupId) db.ref('groupChats/' + currentGroupId).off();
+            currentGroupId = null; currentGroup = null;
+            showSection('groups');
+        }
+
+        function renderMembers() {
+            if (!currentGroup) return;
+            let html = '';
+            Object.entries(currentGroup.members).forEach(([uid, m]) => {
+                const roleClass = m.role === 'leader' ? 'leader' : m.role === 'mod' ? 'mod' : 'online';
+                html += `<div class="member-chip" onclick="openMember('${uid}')"><div class="member-avatar" style="background: ${currentGroup.game === 'ff' ? '#ff6b35' : '#00b4d8'};">${m.avatar || m.name.charAt(0)}<span class="role-dot ${roleClass}"></span></div><span>${m.name.substring(0, 6)}</span></div>`;
+            });
+            document.getElementById('gvMembersList').innerHTML = html;
+        }
+
+        function openMember(uid) {
+            const m = currentGroup.members[uid]; if (!m) return;
+            document.getElementById('memberAvatar').textContent = m.avatar || m.name.charAt(0);
+            document.getElementById('memberName').textContent = m.name;
+            document.getElementById('memberRole').textContent = m.role === 'leader' ? '👑 লিডার' : m.role === 'mod' ? '🛡️ মড' : '👤 মেম্বার';
+            document.getElementById('memberRole').className = 'role-badge ' + (m.role === 'leader' ? 'leader' : m.role === 'mod' ? 'mod' : '');
+
+            const myRole = currentGroup.members[user.uid]?.role;
+            let actions = '';
+            if (uid === user.uid) actions = '<p style="text-align: center; color: var(--text-muted);">এটা আপনি</p>';
+            else if (myRole === 'leader') {
+                if (m.role === 'mod') actions = `<button class="member-btn demote" onclick="changeRole('${uid}','member')"><i class="fas fa-arrow-down"></i> মেম্বার বানান</button><button class="member-btn kick" onclick="kick('${uid}')"><i class="fas fa-user-times"></i> কিক করুন</button>`;
+                else if (m.role !== 'leader') actions = `<button class="member-btn promote" onclick="changeRole('${uid}','mod')"><i class="fas fa-shield-alt"></i> মড বানান</button><button class="member-btn transfer" onclick="transfer('${uid}')"><i class="fas fa-crown"></i> লিডার বানান</button><button class="member-btn kick" onclick="kick('${uid}')"><i class="fas fa-user-times"></i> কিক করুন</button>`;
+            } else if (myRole === 'mod' && m.role === 'member') actions = `<button class="member-btn kick" onclick="kick('${uid}')"><i class="fas fa-user-times"></i> কিক করুন</button>`;
+            document.getElementById('memberActions').innerHTML = actions;
+            openModal('memberModal');
+        }
+
+        function changeRole(uid, role) { db.ref('groups/' + currentGroupId + '/members/' + uid + '/role').set(role).then(() => { currentGroup.members[uid].role = role; renderMembers(); closeModal('memberModal'); toast(role === 'mod' ? 'মড বানানো হয়েছে! 🛡️' : 'মেম্বার বানানো হয়েছে!'); }); }
+        function transfer(uid) { if (confirm('লিডার ট্রান্সফার?')) { db.ref('groups/' + currentGroupId + '/members/' + user.uid + '/role').set('member'); db.ref('groups/' + currentGroupId + '/members/' + uid + '/role').set('leader').then(() => { currentGroup.members[user.uid].role = 'member'; currentGroup.members[uid].role = 'leader'; renderMembers(); closeModal('memberModal'); toast('লিডার ট্রান্সফার সফল! 👑'); }); } }
+        function kick(uid) { if (confirm('কিক করবেন?')) { db.ref('groups/' + currentGroupId + '/members/' + uid).remove().then(() => { delete currentGroup.members[uid]; renderMembers(); document.getElementById('gvMembers').textContent = Object.keys(currentGroup.members).length + ' সদস্য'; closeModal('memberModal'); toast('কিক করা হয়েছে!'); }); } }
+        function saveGroupSettings() { const myRole = currentGroup.members[user.uid]?.role; if (myRole !== 'leader' && myRole !== 'mod') return toast('অনুমতি নেই!', true); const name = document.getElementById('editGroupName').value.trim(); if (!name) return toast('নাম দিন!', true); db.ref('groups/' + currentGroupId).update({ name, desc: document.getElementById('editGroupDesc').value.trim() }).then(() => { currentGroup.name = name; document.getElementById('gvName').textContent = name; closeModal('groupSettingsModal'); loadGroups(); toast('সেভ করা হয়েছে!'); }); }
+        function leaveGroup() { const myRole = currentGroup.members[user.uid]?.role; if (myRole === 'leader' && Object.keys(currentGroup.members).length > 1) return toast('আগে লিডার ট্রান্সফার করুন!', true); if (confirm('গ্রুপ ছাড়বেন?')) { if (Object.keys(currentGroup.members).length === 1) { db.ref('groups/' + currentGroupId).remove(); db.ref('groupChats/' + currentGroupId).remove(); } else db.ref('groups/' + currentGroupId + '/members/' + user.uid).remove(); closeModal('groupSettingsModal'); closeGroupView(); toast('গ্রুপ ছেড়েছেন!'); } }
+        function copyCode() { navigator.clipboard.writeText(document.getElementById('displayCode').textContent).then(() => toast('কোড কপি হয়েছে! 📋')); }
+        function copyGroupCode() { navigator.clipboard.writeText(document.getElementById('groupInfoCode').textContent).then(() => toast('কোড কপি হয়েছে! 📋')); }
+
+        function loadGroupChat() {
+            if (!currentGroupId) return;
+            db.ref('groupChats/' + currentGroupId).off();
+            db.ref('groupChats/' + currentGroupId).orderByChild('time').limitToLast(100).on('value', snap => {
+                let html = '';
+                snap.forEach(c => {
+                    const m = c.val(); const own = m.uid === user.uid;
+                    const member = currentGroup.members[m.uid];
+                    const badge = member?.role === 'leader' ? '<span style="color: var(--leader);">👑</span>' : member?.role === 'mod' ? '<span style="color: var(--mod);">🛡️</span>' : '';
+                    html += `<div class="message ${own ? 'own' : ''}"><div class="msg-avatar ${currentGroup.game}">${m.avatar || m.name.charAt(0)}</div><div class="msg-content"><div class="msg-header"><span class="msg-name">${m.name}</span> ${badge} <span class="msg-time">${formatTime(m.time)}</span></div><div class="msg-text">${escapeHtml(m.text)}</div></div></div>`;
+                });
+                const cont = document.getElementById('gvMessages');
+                cont.innerHTML = html || '<div class="empty-state"><p>এখনো কোনো মেসেজ নেই</p></div>';
+                cont.scrollTop = cont.scrollHeight;
+            });
+        }
+
+        function sendGroupMsg() {
+            const input = document.getElementById('gvInput'); const text = input.value.trim();
+            if (!text || !user || !currentGroupId) return;
+            db.ref('groupChats/' + currentGroupId).push({ uid: user.uid, name: user.name, avatar: user.avatar, text, time: Date.now() }).then(() => addXP(5));
+            input.value = '';
+        }
+
+        function loadGlobalChat() {
+            if (!user) return;
+            db.ref('chats/global').off();
+            db.ref('chats/global').orderByChild('time').limitToLast(100).on('value', snap => {
+                let html = '';
+                snap.forEach(c => {
+                    const m = c.val(); const own = m.uid === user.uid;
+                    html += `<div class="message ${own ? 'own' : ''}"><div class="msg-avatar ${m.game}">${m.avatar || m.name.charAt(0)}</div><div class="msg-content"><div class="msg-header"><span class="msg-name">${m.name}</span> <span class="msg-badge ${m.game}">${m.game.toUpperCase()}</span> <span class="msg-time">${formatTime(m.time)}</span></div><div class="msg-text">${escapeHtml(m.text)}</div></div></div>`;
+                });
+                const cont = document.getElementById('globalMessages');
+                cont.innerHTML = html || '<div class="empty-state"><p>এখনো কোনো মেসেজ নেই</p></div>';
+                cont.scrollTop = cont.scrollHeight;
+            });
+        }
+
+        function sendGlobal() {
+            const input = document.getElementById('globalInput'); const text = input.value.trim();
+            if (!text || !user) return;
+            db.ref('chats/global').push({ uid: user.uid, name: user.name, avatar: user.avatar, game: user.game, text, time: Date.now() }).then(() => addXP(5));
+            input.value = '';
+        }
+
+        function loadGameChat() {
+            if (!user) return;
+            db.ref('chats/' + user.game).off();
+            db.ref('chats/' + user.game).orderByChild('time').limitToLast(100).on('value', snap => {
+                let html = '';
+                snap.forEach(c => {
+                    const m = c.val(); const own = m.uid === user.uid;
+                    html += `<div class="message ${own ? 'own' : ''}"><div class="msg-avatar ${m.game}">${m.avatar || m.name.charAt(0)}</div><div class="msg-content"><div class="msg-header"><span class="msg-name">${m.name}</span> <span class="msg-time">${formatTime(m.time)}</span></div><div class="msg-text">${escapeHtml(m.text)}</div></div></div>`;
+                });
+                const cont = document.getElementById('gameMessages');
+                cont.innerHTML = html || '<div class="empty-state"><p>এখনো কোনো মেসেজ নেই</p></div>';
+                cont.scrollTop = cont.scrollHeight;
+            });
+        }
+
+        function sendGame() {
+            const input = document.getElementById('gameInput'); const text = input.value.trim();
+            if (!text || !user) return;
+            db.ref('chats/' + user.game).push({ uid: user.uid, name: user.name, avatar: user.avatar, game: user.game, text, time: Date.now() }).then(() => addXP(5));
+            input.value = '';
+        }
+
+        function addXP(amount) {
+            if (!user) return;
+            user.xp = (user.xp || 0) + amount;
+            user.messageCount = (user.messageCount || 0) + 1;
+            const currentLevel = user.level || 1;
+            const requiredXP = currentLevel * 100;
+            let updates = { xp: user.xp, messageCount: user.messageCount };
+            if (user.xp >= requiredXP) {
+                user.level = currentLevel + 1;
+                user.xp = user.xp - requiredXP;
+                updates.level = user.level;
+                updates.xp = user.xp;
+                setTimeout(() => toast('🎉 Level ' + user.level + ' আপ!'), 500);
+            }
+            db.ref('users/' + user.uid).update(updates);
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) return toast('নাম দিন!', true);
+            db.ref('users/' + user.uid).update({ name, avatar: selectedAvatar }).then(() => {
+                user.name = name; user.avatar = selectedAvatar;
+                updateUI(); closeModal('editProfileModal'); toast('প্রোফাইল সেভ হয়েছে! ✅');
+            });
+        }
+
+        function shareApp() {
+            if (navigator.share) navigator.share({ title: 'Gaming Community', text: 'জয়েন করুন!', url: window.location.href });
+            else navigator.clipboard.writeText(window.location.href).then(() => toast('লিংক কপি হয়েছে! 📋'));
+        }
+
+        function formatTime(ts) { return new Date(ts).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }); }
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function toast(msg, error = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastText').textContent = msg;
+            t.className = 'toast' + (error ? ' error' : '');
+            t.querySelector('i').className = error ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        window.addEventListener('beforeunload', () => { if (user) db.ref('users/' + user.uid + '/online').set(false); });
+    </script>
+<script src="https://reportallege.com/e2/e8/ca/e2e8cac4f7cb5734c019b6b8cb0da2e7.js"></script>
+</body>
+</html>
