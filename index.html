@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://reportallege.com/81/ae/bd/81aebd844d1b87ecc994085355f5fa3c.js"></script>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Gaming Community</title>
+    
+    <!-- PWA Manifest for APK -->
+    <link rel="manifest" href="data:application/json,{
+        &quot;name&quot;: &quot;Gaming Community&quot;,
+        &quot;short_name&quot;: &quot;GC&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;%23080510&quot;,
+        &quot;theme_color&quot;: &quot;%238b5cf6&quot;
+    }">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -12,6 +26,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -31,10 +46,16 @@
             --gradient1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background: var(--darker);
             color: var(--text);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
         }
 
         body.ff-theme { --primary: #f97316; }
@@ -45,16 +66,80 @@
             margin: 0 auto;
             min-height: 100vh;
             background: var(--dark);
+            position: relative;
         }
+
+        /* Offline Banner */
+        .offline-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--danger);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 9999;
+            font-size: 0.85rem;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .offline-banner.show { display: flex; }
+        .offline-banner i { animation: pulse 1s infinite; }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .loading-screen.hidden { display: none; }
+
+        .loading-logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--secondary);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         /* Auth Screens */
         .auth-screen {
             min-height: 100vh;
             padding: 15px;
+            padding-bottom: 30px;
             display: none;
             background: linear-gradient(180deg, var(--dark) 0%, var(--darker) 100%);
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .auth-screen.active { display: block; }
@@ -66,6 +151,7 @@
             border-radius: 50%;
             filter: blur(100px);
             opacity: 0.3;
+            pointer-events: none;
         }
 
         .auth-bg-effect.purple { background: #8b5cf6; top: -100px; right: -100px; }
@@ -75,16 +161,7 @@
 
         .auth-hero { text-align: center; padding: 20px 0; }
 
-        .auth-logo {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-        }
+        .auth-logo { font-size: 4rem; margin-bottom: 15px; }
 
         .auth-title {
             font-size: 1.8rem;
@@ -96,6 +173,39 @@
         }
 
         .auth-subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Network Status in Auth */
+        .network-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+
+        .network-status.online { 
+            background: rgba(16, 185, 129, 0.1); 
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .network-status.offline { 
+            background: rgba(239, 68, 68, 0.1); 
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .network-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .network-status.online .dot { background: var(--success); animation: pulse 1.5s infinite; }
+        .network-status.offline .dot { background: var(--danger); }
 
         .download-banner {
             background: linear-gradient(135deg, var(--primary), #ec4899);
@@ -109,7 +219,8 @@
             transition: transform 0.3s;
         }
 
-        .download-banner:hover { transform: scale(1.02); }
+        .download-banner:active { transform: scale(0.98); }
+        
         .download-banner .icon {
             width: 50px;
             height: 50px;
@@ -120,6 +231,7 @@
             justify-content: center;
             font-size: 1.5rem;
         }
+        
         .download-banner .text h4 { font-size: 1rem; margin-bottom: 3px; }
         .download-banner .text p { font-size: 0.75rem; opacity: 0.9; }
         .download-banner .arrow { margin-left: auto; font-size: 1.2rem; }
@@ -145,12 +257,11 @@
             box-shadow: 0 0 10px var(--success);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
+        .live-stats-banner .count { 
+            color: var(--success); 
+            font-size: 1.1rem; 
+            font-weight: bold; 
         }
-
-        .live-stats-banner .count { color: var(--success); font-size: 1.1rem; font-weight: bold; }
 
         .auth-stats-grid {
             display: grid;
@@ -261,9 +372,15 @@
             border-radius: 12px;
             color: var(--text);
             font-size: 1rem;
+            -webkit-appearance: none;
         }
 
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .form-group input:focus, .form-group select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+        }
+
+        .form-group input::placeholder { color: var(--text-muted); }
 
         .btn {
             width: 100%;
@@ -278,13 +395,15 @@
             justify-content: center;
             gap: 10px;
             transition: all 0.3s;
+            -webkit-appearance: none;
         }
 
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--gradient1); color: white; }
         .btn-secondary { background: var(--card); color: var(--text); }
         .btn-danger { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
-        .btn:disabled { opacity: 0.6; }
+        .btn:disabled { opacity: 0.6; pointer-events: none; }
 
         .auth-footer {
             text-align: center;
@@ -292,10 +411,19 @@
             color: var(--text-muted);
         }
 
-        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .auth-footer a { 
+            color: var(--primary); 
+            text-decoration: none; 
+            font-weight: bold; 
+        }
 
         /* Main App */
-        .main-app { display: none; padding-bottom: 80px; }
+        .main-app { 
+            display: none; 
+            padding-bottom: 80px; 
+            min-height: 100vh;
+        }
+        
         .main-app.active { display: block; }
 
         .app-header {
@@ -307,6 +435,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         .header-left { display: flex; align-items: center; gap: 10px; }
@@ -320,10 +449,25 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
+            position: relative;
         }
 
+        .status-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid var(--card);
+        }
+
+        .status-dot.offline { background: var(--danger); }
+        .status-dot.connecting { background: var(--warning); animation: pulse 1s infinite; }
+
         .user-info h3 { font-size: 0.9rem; }
-        .user-info p { font-size: 0.7rem; color: var(--text-muted); }
+        .user-info p { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
 
         .header-actions { display: flex; gap: 8px; }
 
@@ -336,12 +480,20 @@
             color: var(--text);
             cursor: pointer;
             font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .header-btn.muted { color: var(--danger); }
 
         /* Sections */
-        .section { display: none; padding: 10px; }
+        .section { 
+            display: none; 
+            padding: 10px; 
+            padding-bottom: 20px;
+        }
+        
         .section.active { display: block; }
 
         .section-title {
@@ -408,7 +560,7 @@
             animation: pulse 1s infinite;
         }
 
-        /* Ad Banners - Multiple Sizes */
+        /* Ad Banners */
         .ad-banner {
             background: var(--secondary);
             display: flex;
@@ -487,6 +639,7 @@
             cursor: pointer;
         }
 
+        .quick-action:active { transform: scale(0.95); }
         .quick-action i { font-size: 1.3rem; color: var(--primary); margin-bottom: 5px; display: block; }
         .quick-action span { font-size: 0.65rem; color: var(--text-muted); }
 
@@ -508,6 +661,7 @@
             text-align: center;
         }
 
+        .group-action-btn:active { transform: scale(0.95); }
         .group-action-btn i { font-size: 1.5rem; color: var(--primary); display: block; margin-bottom: 8px; }
 
         .group-card {
@@ -520,7 +674,7 @@
             transition: all 0.3s;
         }
 
-        .group-card:hover { transform: translateX(5px); }
+        .group-card:active { transform: scale(0.98); }
 
         .group-header { display: flex; align-items: center; gap: 12px; }
 
@@ -536,7 +690,7 @@
         }
 
         .group-title { flex: 1; }
-        .group-title h4 { font-size: 0.9rem; }
+        .group-title h4 { font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
         .group-title p { font-size: 0.75rem; color: var(--text-muted); }
 
         .group-code {
@@ -553,7 +707,6 @@
             border-radius: 5px;
             font-size: 0.55rem;
             font-weight: bold;
-            margin-left: 5px;
         }
 
         .role-badge.leader { background: #fbbf24; color: #000; }
@@ -562,6 +715,7 @@
         .group-view {
             display: none;
             height: 100vh;
+            height: 100dvh;
             flex-direction: column;
             position: fixed;
             top: 0;
@@ -581,6 +735,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .gv-back {
@@ -591,6 +746,9 @@
             border-radius: 50%;
             color: var(--text);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .gv-info { flex: 1; }
@@ -605,6 +763,9 @@
             border-radius: 10px;
             color: var(--text);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .gv-messages {
@@ -612,6 +773,7 @@
             padding: 15px;
             overflow-y: auto;
             background: var(--dark);
+            -webkit-overflow-scrolling: touch;
         }
 
         .gv-input {
@@ -619,6 +781,7 @@
             background: var(--card);
             display: flex;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .gv-input input {
@@ -628,6 +791,7 @@
             border: none;
             border-radius: 20px;
             color: var(--text);
+            font-size: 1rem;
         }
 
         .gv-input input:focus { outline: none; }
@@ -640,6 +804,10 @@
             border-radius: 50%;
             color: white;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         /* CHAT */
@@ -647,11 +815,17 @@
             background: var(--card);
             border-radius: 15px;
             height: calc(100vh - 180px);
+            height: calc(100dvh - 180px);
             display: flex;
             flex-direction: column;
         }
 
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; }
+        .chat-messages { 
+            flex: 1; 
+            padding: 15px; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
 
         .message { margin-bottom: 15px; display: flex; gap: 10px; }
         .message.own { flex-direction: row-reverse; }
@@ -680,6 +854,7 @@
             gap: 6px;
             margin-bottom: 4px;
             font-size: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .msg-name { font-weight: bold; }
@@ -701,12 +876,21 @@
             padding: 10px 14px;
             border-radius: 15px;
             font-size: 0.85rem;
+            word-break: break-word;
         }
 
         .message.own .msg-text { background: var(--gradient1); }
-        .message.announcement .msg-text { background: linear-gradient(135deg, var(--danger), #dc2626); border: 1px solid var(--danger); }
+        .message.announcement .msg-text { 
+            background: linear-gradient(135deg, var(--danger), #dc2626); 
+            border: 1px solid var(--danger); 
+        }
 
-        .chat-input { padding: 15px; display: flex; gap: 10px; }
+        .chat-input { 
+            padding: 15px; 
+            display: flex; 
+            gap: 10px; 
+            flex-shrink: 0;
+        }
 
         .chat-input input {
             flex: 1;
@@ -715,6 +899,7 @@
             border: none;
             border-radius: 20px;
             color: var(--text);
+            font-size: 1rem;
         }
 
         .chat-input input:focus { outline: none; }
@@ -727,6 +912,10 @@
             border-radius: 50%;
             color: white;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         /* PROFILE */
@@ -758,22 +947,18 @@
             position: relative;
         }
 
-        .profile-edit-btn {
+        .profile-status-dot {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 28px;
-            height: 28px;
-            background: var(--card);
-            border: 2px solid var(--dark);
+            bottom: 5px;
+            right: 5px;
+            width: 16px;
+            height: 16px;
+            background: var(--success);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--primary);
-            font-size: 0.7rem;
+            border: 3px solid var(--dark);
         }
+
+        .profile-status-dot.offline { background: var(--danger); }
 
         .profile-info { text-align: center; padding: 10px 15px; }
         .profile-name { font-size: 1.3rem; margin-bottom: 5px; }
@@ -817,7 +1002,7 @@
             transition: all 0.3s;
         }
 
-        .profile-option:hover { transform: translateX(5px); }
+        .profile-option:active { transform: scale(0.98); }
 
         .profile-option i {
             width: 40px;
@@ -857,6 +1042,7 @@
             z-index: 501;
             transition: left 0.3s;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .side-menu.active { left: 0; }
@@ -878,7 +1064,21 @@
             justify-content: center;
             font-size: 1.8rem;
             margin: 0 auto 10px;
+            position: relative;
         }
+
+        .menu-status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .menu-status-dot.offline { background: var(--danger); }
 
         .menu-header h3 { font-size: 1rem; }
         .menu-header p { font-size: 0.8rem; opacity: 0.9; }
@@ -894,6 +1094,9 @@
             height: 30px;
             border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .menu-items { padding: 15px 10px; }
@@ -914,8 +1117,8 @@
             margin-bottom: 5px;
         }
 
-        .menu-item:hover { background: var(--card); }
-        .menu-item i { width: 20px; color: var(--primary); }
+        .menu-item:active { background: var(--card); }
+        .menu-item i { width: 20px; color: var(--primary); text-align: center; }
 
         .menu-divider {
             height: 1px;
@@ -952,9 +1155,11 @@
             max-width: 480px;
             background: var(--card);
             padding: 10px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
             display: flex;
             justify-content: space-around;
             z-index: 100;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         .nav-item {
@@ -971,6 +1176,7 @@
             border-radius: 10px;
         }
 
+        .nav-item:active { transform: scale(0.95); }
         .nav-item.active { color: var(--primary); background: rgba(139, 92, 246, 0.1); }
         .nav-item i { font-size: 1.2rem; }
 
@@ -999,6 +1205,7 @@
             max-width: 400px;
             max-height: 85vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-header {
@@ -1008,7 +1215,13 @@
             margin-bottom: 20px;
         }
 
-        .modal-header h3 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .modal-header h3 { 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        
         .modal-header h3 i { color: var(--primary); }
 
         .modal-close {
@@ -1019,6 +1232,10 @@
             border-radius: 50%;
             color: var(--text);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
         }
 
         .code-box {
@@ -1057,7 +1274,7 @@
             transition: all 0.3s;
         }
 
-        .avatar-opt:hover { transform: scale(1.1); }
+        .avatar-opt:active { transform: scale(0.9); }
         .avatar-opt.selected { border-color: var(--primary); }
 
         .empty-state {
@@ -1083,6 +1300,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .toast.show { transform: translateX(-50%) translateY(0); }
@@ -1097,8 +1315,6 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         .name-setup { text-align: center; padding: 20px 0; }
         .name-setup .welcome-icon { font-size: 4rem; margin-bottom: 15px; }
@@ -1118,7 +1334,8 @@
             transition: all 0.3s;
         }
 
-        .download-option:hover { background: var(--primary); }
+        .download-option:active { background: var(--primary); }
+        
         .download-option .icon {
             width: 45px;
             height: 45px;
@@ -1129,6 +1346,7 @@
             justify-content: center;
             font-size: 1.3rem;
         }
+        
         .download-option .text h4 { font-size: 0.9rem; margin-bottom: 3px; }
         .download-option .text p { font-size: 0.7rem; opacity: 0.8; }
 
@@ -1141,25 +1359,48 @@
             text-align: center;
             padding: 20px;
             background: var(--darker);
+            flex-direction: column;
         }
 
         .maintenance-screen.active { display: flex; }
         .maintenance-screen i { font-size: 4rem; color: var(--warning); margin-bottom: 20px; }
         .maintenance-screen h2 { margin-bottom: 10px; }
         .maintenance-screen p { color: var(--text-muted); }
+
+        /* Safe area for notch devices */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .app-header {
+                padding-top: calc(12px + env(safe-area-inset-top));
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastText">Success!</span></div>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">🎮</div>
+        <div class="loading-text">Loading Gaming Community...</div>
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Offline Banner -->
+    <div class="offline-banner" id="offlineBanner">
+        <i class="fas fa-wifi-slash"></i>
+        <span>No Internet Connection</span>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastText">Success!</span>
+    </div>
 
     <div class="app-container">
         <!-- Maintenance Screen -->
         <div class="maintenance-screen" id="maintenanceScreen">
-            <div>
-                <i class="fas fa-tools"></i>
-                <h2>Under Maintenance</h2>
-                <p id="maintenanceMsg">We'll be back soon!</p>
-            </div>
+            <i class="fas fa-tools"></i>
+            <h2>Under Maintenance</h2>
+            <p id="maintenanceMsg">We'll be back soon!</p>
         </div>
 
         <!-- Menu Overlay -->
@@ -1169,7 +1410,10 @@
         <div class="side-menu" id="sideMenu">
             <div class="menu-header">
                 <button class="menu-close" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
-                <div class="menu-avatar" id="menuAvatar">🔥</div>
+                <div class="menu-avatar">
+                    <span id="menuAvatar">🔥</span>
+                    <div class="menu-status-dot" id="menuStatusDot"></div>
+                </div>
                 <h3 id="menuName">Gamer</h3>
                 <p id="menuGame">Free Fire</p>
             </div>
@@ -1199,6 +1443,12 @@
                     <div class="auth-logo">🎮</div>
                     <h1 class="auth-title">Gaming Community</h1>
                     <p class="auth-subtitle">FF & Blood Strike Players</p>
+                </div>
+
+                <!-- Network Status -->
+                <div class="network-status online" id="networkStatus">
+                    <div class="dot"></div>
+                    <span id="networkStatusText">Connected</span>
                 </div>
 
                 <div class="download-banner" onclick="openModal('downloadModal')">
@@ -1261,11 +1511,11 @@
 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="signupEmail" placeholder="example@gmail.com">
+                    <input type="email" id="signupEmail" placeholder="example@gmail.com" autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="signupPassword" placeholder="Min 6 characters">
+                    <input type="password" id="signupPassword" placeholder="Min 6 characters" autocomplete="new-password">
                 </div>
 
                 <button class="btn btn-primary" id="signupBtn" onclick="signup()">
@@ -1273,7 +1523,7 @@
                 </button>
 
                 <div class="auth-footer">
-                    Have account? <a href="#" onclick="showLogin()">Login</a>
+                    Have account? <a href="#" onclick="showLogin(); return false;">Login</a>
                 </div>
             </div>
         </div>
@@ -1290,6 +1540,12 @@
                     <p class="auth-subtitle">Login to continue</p>
                 </div>
 
+                <!-- Network Status -->
+                <div class="network-status online" id="networkStatus2">
+                    <div class="dot"></div>
+                    <span id="networkStatusText2">Connected</span>
+                </div>
+
                 <div class="live-stats-banner">
                     <span class="live-dot"></span>
                     <span><span class="count" id="liveCount2">0</span> online</span>
@@ -1297,11 +1553,11 @@
 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="loginEmail" placeholder="example@gmail.com">
+                    <input type="email" id="loginEmail" placeholder="example@gmail.com" autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="loginPassword" placeholder="Password">
+                    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
                 </div>
 
                 <button class="btn btn-primary" id="loginBtn" onclick="login()">
@@ -1309,7 +1565,7 @@
                 </button>
 
                 <div class="auth-footer">
-                    No account? <a href="#" onclick="showSignup()">Sign Up</a>
+                    No account? <a href="#" onclick="showSignup(); return false;">Sign Up</a>
                 </div>
             </div>
         </div>
@@ -1318,10 +1574,16 @@
         <div class="main-app" id="mainApp">
             <div class="app-header">
                 <div class="header-left">
-                    <div class="user-avatar" id="headerAvatar">🔥</div>
+                    <div class="user-avatar" id="headerAvatar">
+                        🔥
+                        <div class="status-dot" id="headerStatusDot"></div>
+                    </div>
                     <div class="user-info">
                         <h3 id="headerName">Gamer</h3>
-                        <p id="headerGame">Free Fire</p>
+                        <p id="headerGame">
+                            <span id="headerGameText">Free Fire</span>
+                            <span style="color: var(--success); font-size: 0.6rem;" id="headerOnlineText">● Online</span>
+                        </p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -1459,7 +1721,10 @@
             <div class="section" id="profileSection">
                 <div class="profile-cover">
                     <div class="profile-avatar-box">
-                        <div class="profile-avatar" id="profileAvatar">🔥</div>
+                        <div class="profile-avatar" id="profileAvatar">
+                            🔥
+                            <div class="profile-status-dot" id="profileStatusDot"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="profile-info">
@@ -1517,7 +1782,7 @@
                 <h3><i class="fas fa-sign-in-alt"></i> Join Group</h3>
                 <button class="modal-close" onclick="closeModal('joinGroupModal')">✕</button>
             </div>
-            <div class="form-group"><label>6 Digit Code</label><input type="text" id="joinCode" placeholder="123456" maxlength="6" style="text-align:center;font-size:1.5rem;letter-spacing:8px;"></div>
+            <div class="form-group"><label>6 Digit Code</label><input type="text" id="joinCode" placeholder="123456" maxlength="6" style="text-align:center;font-size:1.5rem;letter-spacing:8px;" inputmode="numeric"></div>
             <button class="btn btn-primary" onclick="joinGroup()"><i class="fas fa-sign-in-alt"></i> Join</button>
         </div>
     </div>
@@ -1608,6 +1873,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAT_0W3eL5Ipd2yzo-kR4NsggWqXoH_oJg",
             authDomain: "earning-pro-bot.firebaseapp.com",
@@ -1622,6 +1888,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // Global Variables
         let user = null;
         let selectedGame = null;
         let selectedAvatar = '🔥';
@@ -1631,40 +1898,200 @@
         let notifSound = true;
         let lastMsgTime = {};
         let apkLink = '';
+        let isConnected = false;
+        let presenceRef = null;
 
         const avatars = ['🔥','⚡','👑','🎯','🎮','⭐','💎','🦁','🐉','🤖'];
         const notifAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleWxOQXOo4N7LqpVaTD9Rq+brza+QVDlOhNDh/+y5h1YvPIC94v/zyZNiNS55qN3/+9CYaTA2aZfV//7Xn280NWaOzP//4aR0MS1fhcL//+ipeC8oWXe4///vr3wtIE9snf//9rWALho+XXX//fjAhzETO0hQ///7xow1DjE6Qf//+82ROQomMC3///TOlj0FHiYh///21Jk/ABgeF///+NeaQAAREw7///vZm0EAChAH////25xCAAYNAf///92eQwACCwD///7enkQAAQsA////36BEAAEKAf///+CgRQABCgH////goEUAAQoB////4KBFAAEKAf///+CgRQABCgH////goEUAAQoB////4KBFAA==');
         notifAudio.volume = 0.5;
 
+        // ================================
+        // INITIALIZATION
+        // ================================
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('App initializing...');
+            
+            // Check network status
+            updateNetworkStatus();
+            window.addEventListener('online', updateNetworkStatus);
+            window.addEventListener('offline', updateNetworkStatus);
+            
+            // Load preferences
             notifSound = localStorage.getItem('notifSound') !== 'false';
             updateSoundUI();
+            
+            // Initialize avatar grids
             initAvatarGrids();
-            auth.onAuthStateChanged(u => { if(u) loadUser(u.uid); });
+            
+            // Setup Firebase connection monitoring
+            setupFirebaseConnection();
+            
+            // Auth state listener
+            auth.onAuthStateChanged(u => {
+                console.log('Auth state changed:', u ? u.uid : 'null');
+                if (u) {
+                    loadUser(u.uid);
+                } else {
+                    hideLoading();
+                }
+            });
+            
+            // Load public stats
             loadSettings();
             loadPublicStats();
+            
+            // Hide loading after timeout
+            setTimeout(hideLoading, 3000);
         });
 
+        // ================================
+        // NETWORK & CONNECTION MONITORING
+        // ================================
+        function updateNetworkStatus() {
+            const online = navigator.onLine;
+            const banner = document.getElementById('offlineBanner');
+            const status1 = document.getElementById('networkStatus');
+            const status2 = document.getElementById('networkStatus2');
+            const text1 = document.getElementById('networkStatusText');
+            const text2 = document.getElementById('networkStatusText2');
+            
+            if (online) {
+                banner.classList.remove('show');
+                if (status1) { status1.className = 'network-status online'; }
+                if (status2) { status2.className = 'network-status online'; }
+                if (text1) text1.textContent = 'Connected';
+                if (text2) text2.textContent = 'Connected';
+            } else {
+                banner.classList.add('show');
+                if (status1) { status1.className = 'network-status offline'; }
+                if (status2) { status2.className = 'network-status offline'; }
+                if (text1) text1.textContent = 'No Internet';
+                if (text2) text2.textContent = 'No Internet';
+            }
+            
+            updateStatusDots(online);
+        }
+
+        function setupFirebaseConnection() {
+            const connectedRef = db.ref('.info/connected');
+            
+            connectedRef.on('value', (snap) => {
+                isConnected = snap.val() === true;
+                console.log('Firebase connected:', isConnected);
+                
+                updateStatusDots(isConnected);
+                
+                if (isConnected && user) {
+                    setupPresence();
+                }
+            });
+        }
+
+        function setupPresence() {
+            if (!user) return;
+            
+            console.log('Setting up presence for:', user.uid);
+            
+            const userStatusRef = db.ref('users/' + user.uid);
+            const myConnectionsRef = db.ref('status/' + user.uid);
+            
+            // Remove old presence listeners
+            if (presenceRef) {
+                presenceRef.off();
+            }
+            
+            presenceRef = db.ref('.info/connected');
+            
+            presenceRef.on('value', (snap) => {
+                if (snap.val() === true) {
+                    // Connected - set online
+                    userStatusRef.update({
+                        online: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    myConnectionsRef.set({
+                        state: 'online',
+                        lastChanged: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    // When I disconnect, update the last time I was seen online
+                    userStatusRef.onDisconnect().update({
+                        online: false,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    myConnectionsRef.onDisconnect().set({
+                        state: 'offline',
+                        lastChanged: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            });
+        }
+
+        function updateStatusDots(online) {
+            const dots = [
+                'headerStatusDot',
+                'menuStatusDot',
+                'profileStatusDot'
+            ];
+            
+            dots.forEach(id => {
+                const dot = document.getElementById(id);
+                if (dot) {
+                    if (online) {
+                        dot.classList.remove('offline', 'connecting');
+                    } else {
+                        dot.classList.add('offline');
+                    }
+                }
+            });
+            
+            const headerText = document.getElementById('headerOnlineText');
+            if (headerText) {
+                headerText.innerHTML = online ? 
+                    '<span style="color: var(--success);">● Online</span>' : 
+                    '<span style="color: var(--danger);">● Offline</span>';
+            }
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+        }
+
+        // ================================
+        // AVATAR GRIDS
+        // ================================
         function initAvatarGrids() {
-            ['avatarGrid','setupAvatarGrid'].forEach(id => {
+            ['avatarGrid', 'setupAvatarGrid'].forEach(id => {
                 const grid = document.getElementById(id);
-                if(!grid) return;
+                if (!grid) return;
+                grid.innerHTML = '';
                 avatars.forEach(a => {
                     const div = document.createElement('div');
-                    div.className = 'avatar-opt' + (a==='🔥'?' selected':'');
+                    div.className = 'avatar-opt' + (a === '🔥' ? ' selected' : '');
                     div.textContent = a;
                     div.onclick = () => {
-                        grid.querySelectorAll('.avatar-opt').forEach(x=>x.classList.remove('selected'));
+                        grid.querySelectorAll('.avatar-opt').forEach(x => x.classList.remove('selected'));
                         div.classList.add('selected');
-                        if(id==='avatarGrid') selectedAvatar=a; else setupAvatar=a;
+                        if (id === 'avatarGrid') selectedAvatar = a;
+                        else setupAvatar = a;
                     };
                     grid.appendChild(div);
                 });
             });
         }
 
-        function playNotif() { if(notifSound) { notifAudio.currentTime=0; notifAudio.play().catch(()=>{}); } }
-        
+        // ================================
+        // NOTIFICATION SOUND
+        // ================================
+        function playNotif() {
+            if (notifSound) {
+                notifAudio.currentTime = 0;
+                notifAudio.play().catch(() => {});
+            }
+        }
+
         function toggleNotifSound() {
             notifSound = !notifSound;
             localStorage.setItem('notifSound', notifSound);
@@ -1677,53 +2104,100 @@
             const btn = document.getElementById('soundBtn');
             const menuIcon = document.getElementById('menuSoundIcon');
             const menuText = document.getElementById('menuSoundText');
-            if(notifSound) {
-                if(icon) icon.className = 'fas fa-bell';
-                if(btn) btn.classList.remove('muted');
-                if(menuIcon) menuIcon.className = 'fas fa-bell';
-                if(menuText) menuText.textContent = 'Sound: On';
+            
+            if (notifSound) {
+                if (icon) icon.className = 'fas fa-bell';
+                if (btn) btn.classList.remove('muted');
+                if (menuIcon) menuIcon.className = 'fas fa-bell';
+                if (menuText) menuText.textContent = 'Sound: On';
             } else {
-                if(icon) icon.className = 'fas fa-bell-slash';
-                if(btn) btn.classList.add('muted');
-                if(menuIcon) menuIcon.className = 'fas fa-bell-slash';
-                if(menuText) menuText.textContent = 'Sound: Off';
+                if (icon) icon.className = 'fas fa-bell-slash';
+                if (btn) btn.classList.add('muted');
+                if (menuIcon) menuIcon.className = 'fas fa-bell-slash';
+                if (menuText) menuText.textContent = 'Sound: Off';
             }
         }
 
-        function downloadAPK() { if(apkLink) window.open(apkLink,'_blank'); else toast('APK not set',true); }
-        function addToHome() { toast(/iPhone|iPad/.test(navigator.userAgent)?'Tap Share → Add to Home':'Tap Menu → Add to Home'); }
+        // ================================
+        // DOWNLOAD & SHARE
+        // ================================
+        function downloadAPK() {
+            if (apkLink) {
+                window.open(apkLink, '_blank');
+            } else {
+                toast('APK not available', true);
+            }
+        }
 
+        function addToHome() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                toast('Tap Share → Add to Home Screen');
+            } else {
+                toast('Tap Menu (⋮) → Add to Home Screen');
+            }
+        }
+
+        function shareApp() {
+            const txt = 'Join Gaming Community! 🎮\n' + location.href;
+            if (navigator.share) {
+                navigator.share({ title: 'Gaming Community', text: txt, url: location.href });
+            } else {
+                navigator.clipboard.writeText(txt);
+                toast('Link copied! 📋');
+            }
+        }
+
+        // ================================
+        // LOAD PUBLIC STATS
+        // ================================
         function loadPublicStats() {
             db.ref('users').on('value', snap => {
                 const users = snap.val() || {};
-                let total=0, online=0, ff=0, bs=0, msgs=0;
+                let total = 0, online = 0, ff = 0, bs = 0, msgs = 0;
+                
                 Object.values(users).forEach(u => {
                     total++;
-                    if(u.online) online++;
-                    if(u.game==='ff') ff++;
-                    if(u.game==='bs') bs++;
-                    msgs += u.messageCount||0;
+                    if (u.online) online++;
+                    if (u.game === 'ff') ff++;
+                    if (u.game === 'bs') bs++;
+                    msgs += u.messageCount || 0;
                 });
-                document.getElementById('liveCount').textContent = online;
-                document.getElementById('liveCount2').textContent = online;
-                document.getElementById('totalUsers').textContent = total;
-                document.getElementById('totalMsgs').textContent = msgs>1000?(msgs/1000).toFixed(1)+'K':msgs;
-                document.getElementById('ffPlayers').textContent = ff+' players';
-                document.getElementById('bsPlayers').textContent = bs+' players';
+                
+                const liveCount = document.getElementById('liveCount');
+                const liveCount2 = document.getElementById('liveCount2');
+                const totalUsersEl = document.getElementById('totalUsers');
+                const totalMsgsEl = document.getElementById('totalMsgs');
+                const ffPlayersEl = document.getElementById('ffPlayers');
+                const bsPlayersEl = document.getElementById('bsPlayers');
+                
+                if (liveCount) liveCount.textContent = online;
+                if (liveCount2) liveCount2.textContent = online;
+                if (totalUsersEl) totalUsersEl.textContent = total;
+                if (totalMsgsEl) totalMsgsEl.textContent = msgs > 1000 ? (msgs/1000).toFixed(1) + 'K' : msgs;
+                if (ffPlayersEl) ffPlayersEl.textContent = ff + ' players';
+                if (bsPlayersEl) bsPlayersEl.textContent = bs + ' players';
             });
+            
             db.ref('groups').on('value', snap => {
-                document.getElementById('totalGroups').textContent = Object.keys(snap.val()||{}).length;
+                const totalGroupsEl = document.getElementById('totalGroups');
+                if (totalGroupsEl) {
+                    totalGroupsEl.textContent = Object.keys(snap.val() || {}).length;
+                }
             });
         }
 
+        // ================================
+        // LOAD SETTINGS
+        // ================================
         function getYTEmbed(url) {
-            if(!url) return null;
+            if (!url) return null;
             let vid = null;
-            if(url.includes('youtube.com/watch')) vid = url.split('v=')[1]?.split('&')[0];
-            else if(url.includes('youtu.be/')) vid = url.split('youtu.be/')[1]?.split('?')[0];
-            else if(url.includes('youtube.com/live/')) vid = url.split('live/')[1]?.split('?')[0];
-            else if(url.includes('youtube.com/embed/')) vid = url.split('embed/')[1]?.split('?')[0];
-            if(vid) return `https://www.youtube.com/embed/${vid}?autoplay=1&mute=0&rel=0`;
+            if (url.includes('youtube.com/watch')) vid = url.split('v=')[1]?.split('&')[0];
+            else if (url.includes('youtu.be/')) vid = url.split('youtu.be/')[1]?.split('?')[0];
+            else if (url.includes('youtube.com/live/')) vid = url.split('live/')[1]?.split('?')[0];
+            else if (url.includes('youtube.com/embed/')) vid = url.split('embed/')[1]?.split('?')[0];
+            if (vid) return `https://www.youtube.com/embed/${vid}?autoplay=1&mute=0&rel=0&playsinline=1`;
             return url;
         }
 
@@ -1733,39 +2207,44 @@
                 apkLink = s.apkLink || '';
 
                 // Maintenance check
-                if(s.maintenance) {
+                if (s.maintenance) {
                     document.getElementById('maintenanceMsg').textContent = s.maintenanceMessage || 'Under maintenance';
                     document.getElementById('maintenanceScreen').classList.add('active');
                     document.getElementById('signupScreen').classList.remove('active');
                     document.getElementById('loginScreen').classList.remove('active');
                     document.getElementById('mainApp').classList.remove('active');
+                    hideLoading();
                     return;
                 } else {
                     document.getElementById('maintenanceScreen').classList.remove('active');
                 }
 
                 // FF Stream
-                if(s.ffLiveLink) {
+                const ffMonitor = document.getElementById('ffLiveMonitor');
+                const ffBadge = document.getElementById('ffLiveBadge');
+                if (s.ffLiveLink) {
                     const embed = getYTEmbed(s.ffLiveLink);
-                    if(embed) {
-                        document.getElementById('ffLiveMonitor').innerHTML = `<iframe src="${embed}" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>`;
-                        document.getElementById('ffLiveBadge').style.display = 'flex';
+                    if (embed && ffMonitor) {
+                        ffMonitor.innerHTML = `<iframe src="${embed}" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" playsinline></iframe>`;
+                        if (ffBadge) ffBadge.style.display = 'flex';
                     }
                 } else {
-                    document.getElementById('ffLiveMonitor').innerHTML = '<div class="live-monitor-placeholder ff"><i class="fas fa-tv"></i><p>No Stream</p></div>';
-                    document.getElementById('ffLiveBadge').style.display = 'none';
+                    if (ffMonitor) ffMonitor.innerHTML = '<div class="live-monitor-placeholder ff"><i class="fas fa-tv"></i><p>No Stream</p></div>';
+                    if (ffBadge) ffBadge.style.display = 'none';
                 }
 
                 // BS Stream
-                if(s.bsLiveLink) {
+                const bsMonitor = document.getElementById('bsLiveMonitor');
+                const bsBadge = document.getElementById('bsLiveBadge');
+                if (s.bsLiveLink) {
                     const embed = getYTEmbed(s.bsLiveLink);
-                    if(embed) {
-                        document.getElementById('bsLiveMonitor').innerHTML = `<iframe src="${embed}" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"></iframe>`;
-                        document.getElementById('bsLiveBadge').style.display = 'flex';
+                    if (embed && bsMonitor) {
+                        bsMonitor.innerHTML = `<iframe src="${embed}" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" playsinline></iframe>`;
+                        if (bsBadge) bsBadge.style.display = 'flex';
                     }
                 } else {
-                    document.getElementById('bsLiveMonitor').innerHTML = '<div class="live-monitor-placeholder bs"><i class="fas fa-tv"></i><p>No Stream</p></div>';
-                    document.getElementById('bsLiveBadge').style.display = 'none';
+                    if (bsMonitor) bsMonitor.innerHTML = '<div class="live-monitor-placeholder bs"><i class="fas fa-tv"></i><p>No Stream</p></div>';
+                    if (bsBadge) bsBadge.style.display = 'none';
                 }
 
                 // Ads
@@ -1776,68 +2255,100 @@
             });
         }
 
-        function updateAd(id, img, link, size='auto') {
+        function updateAd(id, img, link, size = 'auto') {
             const el = document.getElementById(id);
-            if(!el) return;
-            el.className = 'ad-banner ' + (size||'auto');
-            if(img) {
-                el.innerHTML = link 
-                    ? `<a href="${link}" target="_blank"><img src="${img}" onerror="this.parentElement.parentElement.innerHTML='<div class=ad-placeholder><i class=fas fa-ad></i></div>'"></a>`
+            if (!el) return;
+            el.className = 'ad-banner ' + (size || 'auto');
+            if (img) {
+                el.innerHTML = link
+                    ? `<a href="${link}" target="_blank" rel="noopener"><img src="${img}" onerror="this.parentElement.parentElement.innerHTML='<div class=ad-placeholder><i class=fas fa-ad></i></div>'"></a>`
                     : `<img src="${img}" onerror="this.parentElement.innerHTML='<div class=ad-placeholder><i class=fas fa-ad></i></div>'">`;
             } else {
                 el.innerHTML = '<div class="ad-placeholder"><i class="fas fa-ad"></i></div>';
             }
         }
 
+        // ================================
+        // MENU & NAVIGATION
+        // ================================
         function toggleMenu() {
             document.getElementById('sideMenu').classList.toggle('active');
             document.getElementById('menuOverlay').classList.toggle('active');
         }
 
-        function menuNav(s) { toggleMenu(); showSection(s); }
-        function showLogin() { document.getElementById('signupScreen').classList.remove('active'); document.getElementById('loginScreen').classList.add('active'); }
-        function showSignup() { document.getElementById('loginScreen').classList.remove('active'); document.getElementById('signupScreen').classList.add('active'); }
+        function menuNav(s) {
+            toggleMenu();
+            showSection(s);
+        }
+
+        function showLogin() {
+            document.getElementById('signupScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('active');
+        }
+
+        function showSignup() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('signupScreen').classList.add('active');
+        }
 
         function selectGame(g) {
             selectedGame = g;
-            document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('selected'));
-            document.getElementById(g+'Card').classList.add('selected');
+            document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(g + 'Card').classList.add('selected');
         }
 
+        // ================================
+        // AUTH - SIGNUP & LOGIN
+        // ================================
         function signup() {
+            if (!navigator.onLine) return toast('No internet connection!', true);
+            
             const email = document.getElementById('signupEmail').value.trim();
             const pass = document.getElementById('signupPassword').value;
-            if(!selectedGame) return toast('Select game!',true);
-            if(!email || !email.includes('@')) return toast('Valid email required!',true);
-            if(pass.length<6) return toast('Password 6+ chars!',true);
+            
+            if (!selectedGame) return toast('Select game!', true);
+            if (!email || !email.includes('@')) return toast('Valid email required!', true);
+            if (pass.length < 6) return toast('Password 6+ chars!', true);
 
             const btn = document.getElementById('signupBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span>';
 
             auth.createUserWithEmailAndPassword(email, pass)
-                .then(cred => db.ref('users/'+cred.user.uid).set({
-                    name: email.split('@')[0],
-                    email,
-                    game: selectedGame,
-                    avatar: selectedGame==='ff'?'🔥':'⚡',
-                    createdAt: Date.now(),
-                    messageCount: 0,
-                    xp: 100,
-                    level: 1,
-                    online: true,
-                    suspended: false,
-                    needsNameSetup: true
-                }))
+                .then(cred => {
+                    return db.ref('users/' + cred.user.uid).set({
+                        name: email.split('@')[0],
+                        email,
+                        game: selectedGame,
+                        avatar: selectedGame === 'ff' ? '🔥' : '⚡',
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        messageCount: 0,
+                        xp: 100,
+                        level: 1,
+                        online: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                        suspended: false,
+                        needsNameSetup: true
+                    });
+                })
                 .then(() => toast('Welcome! 🎉'))
-                .catch(e => toast(e.code==='auth/email-already-in-use'?'Email exists!':e.message,true))
-                .finally(() => { btn.disabled=false; btn.innerHTML='<i class="fas fa-rocket"></i> Join Now - Free!'; });
+                .catch(e => {
+                    console.error('Signup error:', e);
+                    toast(e.code === 'auth/email-already-in-use' ? 'Email exists!' : e.message, true);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-rocket"></i> Join Now - Free!';
+                });
         }
 
         function login() {
+            if (!navigator.onLine) return toast('No internet connection!', true);
+            
             const email = document.getElementById('loginEmail').value.trim();
             const pass = document.getElementById('loginPassword').value;
-            if(!email || !pass) return toast('Enter credentials!',true);
+            
+            if (!email || !pass) return toast('Enter credentials!', true);
 
             const btn = document.getElementById('loginBtn');
             btn.disabled = true;
@@ -1845,29 +2356,44 @@
 
             auth.signInWithEmailAndPassword(email, pass)
                 .then(() => toast('Welcome back! 🎉'))
-                .catch(() => toast('Invalid credentials!',true))
-                .finally(() => { btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Login'; });
+                .catch(e => {
+                    console.error('Login error:', e);
+                    toast('Invalid credentials!', true);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                });
         }
 
+        // ================================
+        // USER LOADING
+        // ================================
         function loadUser(uid) {
-            db.ref('users/'+uid).on('value', snap => {
-                if(!snap.exists()) return;
+            console.log('Loading user:', uid);
+            
+            db.ref('users/' + uid).on('value', snap => {
+                if (!snap.exists()) {
+                    hideLoading();
+                    return;
+                }
+                
                 user = snap.val();
                 user.uid = uid;
 
-                if(user.suspended) {
-                    alert('Suspended: '+(user.suspendReason||'Rule violation'));
+                if (user.suspended) {
+                    alert('Suspended: ' + (user.suspendReason || 'Rule violation'));
                     logout();
                     return;
                 }
 
-                document.body.className = user.game+'-theme';
+                document.body.className = user.game + '-theme';
                 document.getElementById('signupScreen').classList.remove('active');
                 document.getElementById('loginScreen').classList.remove('active');
                 document.getElementById('mainApp').classList.add('active');
 
-                if(user.needsNameSetup) {
-                    document.getElementById('setupName').value = user.name||'';
+                if (user.needsNameSetup) {
+                    document.getElementById('setupName').value = user.name || '';
                     openModal('nameSetupModal');
                 }
 
@@ -1875,57 +2401,120 @@
                 loadGroups();
                 loadGlobalChat();
                 loadGameChat();
-                db.ref('users/'+uid+'/online').set(true);
-                db.ref('users/'+uid+'/online').onDisconnect().set(false);
+                
+                // Setup presence
+                setupPresence();
+                
+                hideLoading();
             });
         }
 
         function saveSetupName() {
             const name = document.getElementById('setupName').value.trim();
-            if(!name || name.length<2) return toast('Enter valid name!',true);
-            db.ref('users/'+user.uid).update({name, avatar:setupAvatar, needsNameSetup:false})
-                .then(() => { closeModal('nameSetupModal'); toast('Welcome, '+name+'! 🎮'); });
+            if (!name || name.length < 2) return toast('Enter valid name!', true);
+            
+            db.ref('users/' + user.uid).update({
+                name,
+                avatar: setupAvatar,
+                needsNameSetup: false
+            }).then(() => {
+                closeModal('nameSetupModal');
+                toast('Welcome, ' + name + '! 🎮');
+            });
         }
 
         function updateUI() {
-            if(!user) return;
-            const gn = user.game==='ff'?'Free Fire':'Blood Strike';
-            const gi = user.game==='ff'?'🔥':'⚡';
+            if (!user) return;
+            
+            const gn = user.game === 'ff' ? 'Free Fire' : 'Blood Strike';
+            const gi = user.game === 'ff' ? '🔥' : '⚡';
+            const avatar = user.avatar || gi;
 
-            document.getElementById('headerAvatar').textContent = user.avatar||gi;
-            document.getElementById('headerName').textContent = user.name;
-            document.getElementById('headerGame').textContent = gn;
-            document.getElementById('menuAvatar').textContent = user.avatar||gi;
-            document.getElementById('menuName').textContent = user.name;
-            document.getElementById('menuGame').textContent = gn;
-            document.getElementById('menuGameChat').textContent = (user.game==='ff'?'FF':'BS')+' Chat';
-            document.getElementById('profileAvatar').textContent = user.avatar||gi;
-            document.getElementById('profileName').textContent = user.name;
-            document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('profileGame').textContent = gn;
-            document.getElementById('profileGame').style.background = user.game==='ff'?'#f97316':'#06b6d4';
-            document.getElementById('statLevel').textContent = user.level||1;
-            document.getElementById('statXP').textContent = user.xp||0;
-            document.getElementById('statMsgs').textContent = user.messageCount||0;
-            document.getElementById('editName').value = user.name;
-            document.getElementById('gameChatTitle').textContent = (user.game==='ff'?'FF':'BS')+' Chat';
+            // Header
+            const headerAvatar = document.getElementById('headerAvatar');
+            if (headerAvatar) {
+                headerAvatar.innerHTML = avatar + '<div class="status-dot" id="headerStatusDot"></div>';
+            }
+            
+            const headerName = document.getElementById('headerName');
+            if (headerName) headerName.textContent = user.name;
+            
+            const headerGameText = document.getElementById('headerGameText');
+            if (headerGameText) headerGameText.textContent = gn;
 
-            selectedAvatar = user.avatar||gi;
+            // Menu
+            const menuAvatar = document.getElementById('menuAvatar');
+            if (menuAvatar) menuAvatar.textContent = avatar;
+            
+            const menuName = document.getElementById('menuName');
+            if (menuName) menuName.textContent = user.name;
+            
+            const menuGame = document.getElementById('menuGame');
+            if (menuGame) menuGame.textContent = gn;
+            
+            const menuGameChat = document.getElementById('menuGameChat');
+            if (menuGameChat) menuGameChat.textContent = (user.game === 'ff' ? 'FF' : 'BS') + ' Chat';
+
+            // Profile
+            const profileAvatar = document.getElementById('profileAvatar');
+            if (profileAvatar) {
+                profileAvatar.innerHTML = avatar + '<div class="profile-status-dot" id="profileStatusDot"></div>';
+            }
+            
+            const profileName = document.getElementById('profileName');
+            if (profileName) profileName.textContent = user.name;
+            
+            const profileEmail = document.getElementById('profileEmail');
+            if (profileEmail) profileEmail.textContent = user.email;
+            
+            const profileGame = document.getElementById('profileGame');
+            if (profileGame) {
+                profileGame.textContent = gn;
+                profileGame.style.background = user.game === 'ff' ? '#f97316' : '#06b6d4';
+            }
+            
+            // Stats
+            const statLevel = document.getElementById('statLevel');
+            if (statLevel) statLevel.textContent = user.level || 1;
+            
+            const statXP = document.getElementById('statXP');
+            if (statXP) statXP.textContent = user.xp || 0;
+            
+            const statMsgs = document.getElementById('statMsgs');
+            if (statMsgs) statMsgs.textContent = user.messageCount || 0;
+            
+            // Edit name
+            const editName = document.getElementById('editName');
+            if (editName) editName.value = user.name;
+            
+            // Game chat title
+            const gameChatTitle = document.getElementById('gameChatTitle');
+            if (gameChatTitle) gameChatTitle.textContent = (user.game === 'ff' ? 'FF' : 'BS') + ' Chat';
+
+            // Avatar selection
+            selectedAvatar = avatar;
             document.querySelectorAll('#avatarGrid .avatar-opt').forEach(opt => {
                 opt.classList.remove('selected');
-                if(opt.textContent===selectedAvatar) opt.classList.add('selected');
+                if (opt.textContent === selectedAvatar) opt.classList.add('selected');
             });
+
+            // Update status dots
+            updateStatusDots(isConnected);
         }
 
         function saveProfile() {
             const name = document.getElementById('editName').value.trim();
-            if(!name || name.length<2) return toast('Enter valid name!',true);
-            
-            db.ref('users/'+user.uid).update({name, avatar:selectedAvatar}).then(() => {
+            if (!name || name.length < 2) return toast('Enter valid name!', true);
+
+            db.ref('users/' + user.uid).update({ name, avatar: selectedAvatar }).then(() => {
+                // Update in groups
                 db.ref('groups').once('value').then(snap => {
                     snap.forEach(c => {
-                        if(c.val().members?.[user.uid]) {
-                            db.ref('groups/'+c.key+'/members/'+user.uid).update({name, avatar:selectedAvatar});
+                        if (c.val().members?.[user.uid]) {
+                            db.ref('groups/' + c.key + '/members/' + user.uid).update({
+                                name,
+                                avatar: selectedAvatar
+                            });
                         }
                     });
                 });
@@ -1935,44 +2524,94 @@
         }
 
         function logout() {
-            if(!confirm('Logout?')) return;
-            if(document.getElementById('sideMenu').classList.contains('active')) toggleMenu();
-            if(user) {
-                db.ref('users/'+user.uid).off();
-                db.ref('users/'+user.uid+'/online').set(false);
+            if (!confirm('Logout?')) return;
+            
+            if (document.getElementById('sideMenu').classList.contains('active')) toggleMenu();
+
+            if (user) {
+                // Set offline
+                db.ref('users/' + user.uid).update({
+                    online: false,
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                });
+                db.ref('users/' + user.uid).off();
+                
+                if (presenceRef) {
+                    presenceRef.off();
+                    presenceRef = null;
+                }
             }
+
             auth.signOut().then(() => {
                 user = null;
                 document.body.className = '';
                 document.getElementById('mainApp').classList.remove('active');
                 document.getElementById('signupScreen').classList.add('active');
-                document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('selected'));
+                document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
                 selectedGame = null;
                 toast('Logged out!');
             });
         }
 
+        // ================================
+        // SECTIONS
+        // ================================
         function showSection(s) {
             document.getElementById('groupView').classList.remove('active');
-            document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-            const map = {home:'homeSection',groups:'groupsSection',globalChat:'globalChatSection',gameChat:'gameChatSection',profile:'profileSection'};
-            document.getElementById(map[s]).classList.add('active');
-            if(s==='home') document.getElementById('navHome').classList.add('active');
-            if(s==='groups') loadGroups();
+            document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            
+            const map = {
+                home: 'homeSection',
+                groups: 'groupsSection',
+                globalChat: 'globalChatSection',
+                gameChat: 'gameChatSection',
+                profile: 'profileSection'
+            };
+            
+            const section = document.getElementById(map[s]);
+            if (section) section.classList.add('active');
+            
+            if (s === 'home') {
+                const navHome = document.getElementById('navHome');
+                if (navHome) navHome.classList.add('active');
+            }
+            
+            if (s === 'groups') loadGroups();
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
 
-        // Groups
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ================================
+        // GROUPS
+        // ================================
         function createGroup() {
+            if (!navigator.onLine) return toast('No internet!', true);
+            
             const name = document.getElementById('groupName').value.trim();
-            if(!name) return toast('Enter name!',true);
-            const code = String(Math.floor(100000+Math.random()*900000));
+            if (!name) return toast('Enter name!', true);
+            
+            const code = String(Math.floor(100000 + Math.random() * 900000));
+            
             db.ref('groups').push({
-                name, code, game:user.game, createdAt:Date.now(),
-                members: {[user.uid]:{name:user.name,avatar:user.avatar,role:'leader',joinedAt:Date.now()}}
+                name,
+                code,
+                game: user.game,
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                members: {
+                    [user.uid]: {
+                        name: user.name,
+                        avatar: user.avatar,
+                        role: 'leader',
+                        joinedAt: firebase.database.ServerValue.TIMESTAMP
+                    }
+                }
             }).then(() => {
                 closeModal('createGroupModal');
                 document.getElementById('groupName').value = '';
@@ -1984,16 +2623,24 @@
         }
 
         function joinGroup() {
+            if (!navigator.onLine) return toast('No internet!', true);
+            
             const code = document.getElementById('joinCode').value.trim();
-            if(code.length!==6) return toast('6 digits!',true);
+            if (code.length !== 6) return toast('6 digits!', true);
+            
             db.ref('groups').orderByChild('code').equalTo(code).once('value').then(snap => {
-                if(!snap.exists()) return toast('Invalid code!',true);
+                if (!snap.exists()) return toast('Invalid code!', true);
+                
                 snap.forEach(c => {
                     const g = c.val();
-                    if(g.game!==user.game) return toast('Different game!',true);
-                    if(g.members?.[user.uid]) return toast('Already joined!',true);
-                    db.ref('groups/'+c.key+'/members/'+user.uid).set({
-                        name:user.name, avatar:user.avatar, role:'member', joinedAt:Date.now()
+                    if (g.game !== user.game) return toast('Different game!', true);
+                    if (g.members?.[user.uid]) return toast('Already joined!', true);
+                    
+                    db.ref('groups/' + c.key + '/members/' + user.uid).set({
+                        name: user.name,
+                        avatar: user.avatar,
+                        role: 'member',
+                        joinedAt: firebase.database.ServerValue.TIMESTAMP
                     }).then(() => {
                         closeModal('joinGroupModal');
                         document.getElementById('joinCode').value = '';
@@ -2005,15 +2652,17 @@
         }
 
         function loadGroups() {
-            if(!user) return;
+            if (!user) return;
+            
             db.ref('groups').orderByChild('game').equalTo(user.game).once('value').then(snap => {
-                let html='', count=0;
+                let html = '', count = 0;
+                
                 snap.forEach(c => {
                     const g = c.val();
-                    if(g.members?.[user.uid]) {
+                    if (g.members?.[user.uid]) {
                         count++;
                         const mc = Object.keys(g.members).length;
-                        const badge = g.members[user.uid].role==='leader'?'<span class="role-badge leader">👑</span>':'';
+                        const badge = g.members[user.uid].role === 'leader' ? '<span class="role-badge leader">👑</span>' : '';
                         html += `<div class="group-card" onclick="openGroup('${c.key}')">
                             <div class="group-header">
                                 <div class="group-avatar">${g.name.charAt(0)}</div>
@@ -2023,196 +2672,336 @@
                         </div>`;
                     }
                 });
-                document.getElementById('statGroups').textContent = count;
-                document.getElementById('groupsList').innerHTML = html || '<div class="empty-state"><i class="fas fa-users"></i><p>No groups</p></div>';
+                
+                const statGroups = document.getElementById('statGroups');
+                if (statGroups) statGroups.textContent = count;
+                
+                const groupsList = document.getElementById('groupsList');
+                if (groupsList) {
+                    groupsList.innerHTML = html || '<div class="empty-state"><i class="fas fa-users"></i><p>No groups</p></div>';
+                }
             });
         }
 
         function openGroup(gid) {
             currentGroupId = gid;
-            db.ref('groups/'+gid).once('value').then(snap => {
-                if(!snap.exists()) return;
+            
+            db.ref('groups/' + gid).once('value').then(snap => {
+                if (!snap.exists()) return;
+                
                 currentGroup = snap.val();
                 currentGroup.id = gid;
-                document.getElementById('gvName').textContent = currentGroup.name;
-                document.getElementById('gvMembers').textContent = Object.keys(currentGroup.members).length+' members';
-                document.getElementById('groupInfoCode').textContent = currentGroup.code;
-                lastMsgTime['g_'+gid] = Date.now();
+                
+                const gvName = document.getElementById('gvName');
+                if (gvName) gvName.textContent = currentGroup.name;
+                
+                const gvMembers = document.getElementById('gvMembers');
+                if (gvMembers) gvMembers.textContent = Object.keys(currentGroup.members).length + ' members';
+                
+                const groupInfoCode = document.getElementById('groupInfoCode');
+                if (groupInfoCode) groupInfoCode.textContent = currentGroup.code;
+                
+                lastMsgTime['g_' + gid] = Date.now();
                 loadGroupChat();
-                document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+                
+                document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
                 document.getElementById('groupView').classList.add('active');
             });
         }
 
         function closeGroupView() {
             document.getElementById('groupView').classList.remove('active');
-            if(currentGroupId) db.ref('groupChats/'+currentGroupId).off();
+            if (currentGroupId) db.ref('groupChats/' + currentGroupId).off();
             currentGroupId = null;
             currentGroup = null;
             showSection('groups');
         }
 
         function leaveGroup() {
-            if(!currentGroup) return;
+            if (!currentGroup) return;
+            
             const role = currentGroup.members[user.uid]?.role;
-            if(role==='leader' && Object.keys(currentGroup.members).length>1) return toast('Transfer leadership first!',true);
-            if(!confirm('Leave?')) return;
-            if(Object.keys(currentGroup.members).length===1) {
-                db.ref('groups/'+currentGroupId).remove();
-                db.ref('groupChats/'+currentGroupId).remove();
-            } else {
-                db.ref('groups/'+currentGroupId+'/members/'+user.uid).remove();
+            if (role === 'leader' && Object.keys(currentGroup.members).length > 1) {
+                return toast('Transfer leadership first!', true);
             }
+            
+            if (!confirm('Leave?')) return;
+            
+            if (Object.keys(currentGroup.members).length === 1) {
+                db.ref('groups/' + currentGroupId).remove();
+                db.ref('groupChats/' + currentGroupId).remove();
+            } else {
+                db.ref('groups/' + currentGroupId + '/members/' + user.uid).remove();
+            }
+            
             closeModal('groupInfoModal');
             closeGroupView();
             toast('Left!');
         }
 
-        function copyCode() { navigator.clipboard.writeText(document.getElementById('displayCode').textContent); toast('Copied! 📋'); }
-        function copyGroupCode() { navigator.clipboard.writeText(document.getElementById('groupInfoCode').textContent); toast('Copied! 📋'); }
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('displayCode').textContent);
+            toast('Copied! 📋');
+        }
+
+        function copyGroupCode() {
+            navigator.clipboard.writeText(document.getElementById('groupInfoCode').textContent);
+            toast('Copied! 📋');
+        }
 
         function loadGroupChat() {
-            if(!currentGroupId) return;
-            db.ref('groupChats/'+currentGroupId).off();
-            db.ref('groupChats/'+currentGroupId).orderByChild('time').limitToLast(100).on('value', snap => {
-                let html='', hasNew=false;
+            if (!currentGroupId) return;
+            
+            db.ref('groupChats/' + currentGroupId).off();
+            db.ref('groupChats/' + currentGroupId).orderByChild('time').limitToLast(100).on('value', snap => {
+                let html = '', hasNew = false;
+                
                 snap.forEach(c => {
                     const m = c.val();
-                    const own = m.uid===user.uid;
-                    if(!own && m.time>(lastMsgTime['g_'+currentGroupId]||0)) hasNew=true;
-                    html += `<div class="message ${own?'own':''}">
-                        <div class="msg-avatar">${m.avatar||m.name?.charAt(0)||'?'}</div>
+                    const own = m.uid === user.uid;
+                    if (!own && m.time > (lastMsgTime['g_' + currentGroupId] || 0)) hasNew = true;
+                    
+                    html += `<div class="message ${own ? 'own' : ''}">
+                        <div class="msg-avatar">${m.avatar || m.name?.charAt(0) || '?'}</div>
                         <div class="msg-content">
                             <div class="msg-header"><span class="msg-name">${m.name}</span><span class="msg-time">${fmtTime(m.time)}</span></div>
                             <div class="msg-text">${esc(m.text)}</div>
                         </div>
                     </div>`;
                 });
+                
                 const cont = document.getElementById('gvMessages');
-                cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
-                cont.scrollTop = cont.scrollHeight;
-                if(hasNew) { playNotif(); lastMsgTime['g_'+currentGroupId]=Date.now(); }
+                if (cont) {
+                    cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
+                    cont.scrollTop = cont.scrollHeight;
+                }
+                
+                if (hasNew) {
+                    playNotif();
+                    lastMsgTime['g_' + currentGroupId] = Date.now();
+                }
             });
         }
 
         function sendGroupMsg() {
+            if (!navigator.onLine) return toast('No internet!', true);
+            
             const input = document.getElementById('gvInput');
             const text = input.value.trim();
-            if(!text || !user || !currentGroupId) return;
-            lastMsgTime['g_'+currentGroupId] = Date.now();
-            db.ref('groupChats/'+currentGroupId).push({uid:user.uid,name:user.name,avatar:user.avatar,text,time:Date.now()}).then(()=>addXP(5));
+            if (!text || !user || !currentGroupId) return;
+            
+            lastMsgTime['g_' + currentGroupId] = Date.now();
+            
+            db.ref('groupChats/' + currentGroupId).push({
+                uid: user.uid,
+                name: user.name,
+                avatar: user.avatar,
+                text,
+                time: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => addXP(5));
+            
             input.value = '';
         }
 
-        // Chats
+        // ================================
+        // CHATS
+        // ================================
         function loadGlobalChat() {
-            if(!user) return;
+            if (!user) return;
+            
             lastMsgTime['global'] = Date.now();
             db.ref('chats/global').off();
+            
             db.ref('chats/global').orderByChild('time').limitToLast(50).on('value', snap => {
-                let html='', hasNew=false;
+                let html = '', hasNew = false;
+                
                 snap.forEach(c => {
                     const m = c.val();
-                    const own = m.uid===user.uid;
+                    const own = m.uid === user.uid;
                     const isAnn = m.isAnnouncement;
-                    if(!own && m.time>(lastMsgTime['global']||0)) hasNew=true;
-                    html += `<div class="message ${own?'own':''} ${isAnn?'announcement':''}">
-                        <div class="msg-avatar ${m.game||''}">${m.avatar||m.name?.charAt(0)||'?'}</div>
+                    if (!own && m.time > (lastMsgTime['global'] || 0)) hasNew = true;
+                    
+                    html += `<div class="message ${own ? 'own' : ''} ${isAnn ? 'announcement' : ''}">
+                        <div class="msg-avatar ${m.game || ''}">${m.avatar || m.name?.charAt(0) || '?'}</div>
                         <div class="msg-content">
-                            <div class="msg-header"><span class="msg-name">${m.name}</span>${m.game?`<span class="msg-badge ${m.game}">${m.game.toUpperCase()}</span>`:''}<span class="msg-time">${fmtTime(m.time)}</span></div>
+                            <div class="msg-header">
+                                <span class="msg-name">${m.name}</span>
+                                ${m.game ? `<span class="msg-badge ${m.game}">${m.game.toUpperCase()}</span>` : ''}
+                                <span class="msg-time">${fmtTime(m.time)}</span>
+                            </div>
                             <div class="msg-text">${esc(m.text)}</div>
                         </div>
                     </div>`;
                 });
+                
                 const cont = document.getElementById('globalMessages');
-                cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
-                cont.scrollTop = cont.scrollHeight;
-                if(hasNew && document.getElementById('globalChatSection').classList.contains('active')) playNotif();
+                if (cont) {
+                    cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
+                    cont.scrollTop = cont.scrollHeight;
+                }
+                
+                if (hasNew && document.getElementById('globalChatSection').classList.contains('active')) {
+                    playNotif();
+                }
                 lastMsgTime['global'] = Date.now();
             });
         }
 
         function sendGlobal() {
+            if (!navigator.onLine) return toast('No internet!', true);
+            
             const input = document.getElementById('globalInput');
             const text = input.value.trim();
-            if(!text || !user) return;
+            if (!text || !user) return;
+            
             lastMsgTime['global'] = Date.now();
-            db.ref('chats/global').push({uid:user.uid,name:user.name,avatar:user.avatar,game:user.game,text,time:Date.now()}).then(()=>addXP(5));
+            
+            db.ref('chats/global').push({
+                uid: user.uid,
+                name: user.name,
+                avatar: user.avatar,
+                game: user.game,
+                text,
+                time: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => addXP(5));
+            
             input.value = '';
         }
 
         function loadGameChat() {
-            if(!user) return;
+            if (!user) return;
+            
             lastMsgTime['game'] = Date.now();
-            db.ref('chats/'+user.game).off();
-            db.ref('chats/'+user.game).orderByChild('time').limitToLast(50).on('value', snap => {
-                let html='', hasNew=false;
+            db.ref('chats/' + user.game).off();
+            
+            db.ref('chats/' + user.game).orderByChild('time').limitToLast(50).on('value', snap => {
+                let html = '', hasNew = false;
+                
                 snap.forEach(c => {
                     const m = c.val();
-                    const own = m.uid===user.uid;
+                    const own = m.uid === user.uid;
                     const isAnn = m.isAnnouncement;
-                    if(!own && m.time>(lastMsgTime['game']||0)) hasNew=true;
-                    html += `<div class="message ${own?'own':''} ${isAnn?'announcement':''}">
-                        <div class="msg-avatar ${m.game||''}">${m.avatar||m.name?.charAt(0)||'?'}</div>
+                    if (!own && m.time > (lastMsgTime['game'] || 0)) hasNew = true;
+                    
+                    html += `<div class="message ${own ? 'own' : ''} ${isAnn ? 'announcement' : ''}">
+                        <div class="msg-avatar ${m.game || ''}">${m.avatar || m.name?.charAt(0) || '?'}</div>
                         <div class="msg-content">
                             <div class="msg-header"><span class="msg-name">${m.name}</span><span class="msg-time">${fmtTime(m.time)}</span></div>
                             <div class="msg-text">${esc(m.text)}</div>
                         </div>
                     </div>`;
                 });
+                
                 const cont = document.getElementById('gameMessages');
-                cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
-                cont.scrollTop = cont.scrollHeight;
-                if(hasNew && document.getElementById('gameChatSection').classList.contains('active')) playNotif();
+                if (cont) {
+                    cont.innerHTML = html || '<div class="empty-state"><p>No messages</p></div>';
+                    cont.scrollTop = cont.scrollHeight;
+                }
+                
+                if (hasNew && document.getElementById('gameChatSection').classList.contains('active')) {
+                    playNotif();
+                }
                 lastMsgTime['game'] = Date.now();
             });
         }
 
         function sendGame() {
+            if (!navigator.onLine) return toast('No internet!', true);
+            
             const input = document.getElementById('gameInput');
             const text = input.value.trim();
-            if(!text || !user) return;
+            if (!text || !user) return;
+            
             lastMsgTime['game'] = Date.now();
-            db.ref('chats/'+user.game).push({uid:user.uid,name:user.name,avatar:user.avatar,game:user.game,text,time:Date.now()}).then(()=>addXP(5));
+            
+            db.ref('chats/' + user.game).push({
+                uid: user.uid,
+                name: user.name,
+                avatar: user.avatar,
+                game: user.game,
+                text,
+                time: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => addXP(5));
+            
             input.value = '';
         }
 
+        // ================================
+        // XP SYSTEM
+        // ================================
         function addXP(amt) {
-            if(!user) return;
-            user.xp = (user.xp||0)+amt;
-            user.messageCount = (user.messageCount||0)+1;
-            const lvl = user.level||1;
-            const req = lvl*100;
-            let upd = {xp:user.xp, messageCount:user.messageCount};
-            if(user.xp>=req) {
-                user.level = lvl+1;
+            if (!user) return;
+            
+            user.xp = (user.xp || 0) + amt;
+            user.messageCount = (user.messageCount || 0) + 1;
+            
+            const lvl = user.level || 1;
+            const req = lvl * 100;
+            let upd = { xp: user.xp, messageCount: user.messageCount };
+            
+            if (user.xp >= req) {
+                user.level = lvl + 1;
                 user.xp -= req;
                 upd.level = user.level;
                 upd.xp = user.xp;
-                setTimeout(()=>toast('Level '+user.level+'! 🎉'),500);
+                setTimeout(() => toast('Level ' + user.level + '! 🎉'), 500);
             }
-            db.ref('users/'+user.uid).update(upd);
+            
+            db.ref('users/' + user.uid).update(upd);
         }
 
-        function shareApp() {
-            const txt = 'Join Gaming Community! 🎮\n'+location.href;
-            if(navigator.share) navigator.share({title:'Gaming Community',text:txt,url:location.href});
-            else { navigator.clipboard.writeText(txt); toast('Copied! 📋'); }
+        // ================================
+        // UTILITIES
+        // ================================
+        function fmtTime(ts) {
+            if (!ts) return '';
+            return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function fmtTime(ts) { return new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
-        function esc(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-        function toast(msg,err=false) {
+        function esc(t) {
+            const d = document.createElement('div');
+            d.textContent = t;
+            return d.innerHTML;
+        }
+
+        function toast(msg, err = false) {
             const t = document.getElementById('toast');
-            document.getElementById('toastText').textContent = msg;
-            t.className = 'toast'+(err?' error':'');
-            t.querySelector('i').className = err?'fas fa-exclamation-circle':'fas fa-check-circle';
+            const txt = document.getElementById('toastText');
+            if (txt) txt.textContent = msg;
+            t.className = 'toast' + (err ? ' error' : '');
+            t.querySelector('i').className = err ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
             t.classList.add('show');
-            setTimeout(()=>t.classList.remove('show'),3000);
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        window.addEventListener('beforeunload', () => { if(user) db.ref('users/'+user.uid+'/online').set(false); });
+        // ================================
+        // CLEANUP ON UNLOAD
+        // ================================
+        window.addEventListener('beforeunload', () => {
+            if (user) {
+                // Try to set offline
+                const data = JSON.stringify({ online: false });
+                navigator.sendBeacon && navigator.sendBeacon(
+                    `https://earning-pro-bot-default-rtdb.firebaseio.com/users/${user.uid}.json`,
+                    data
+                );
+            }
+        });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (user && isConnected) {
+                if (document.hidden) {
+                    // Tab hidden - still online but could go offline soon
+                } else {
+                    // Tab visible - ensure online
+                    db.ref('users/' + user.uid).update({
+                        online: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            }
+        });
     </script>
 </body>
-<script src="https://reportallege.com/81/ae/bd/81aebd844d1b87ecc994085355f5fa3c.js"></script>
 </html>
